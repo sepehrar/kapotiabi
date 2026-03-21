@@ -1,0 +1,19 @@
+{
+  "home": {
+    "title": "CarFix",
+    "description": "Sinu usaldusväärne autohoolduse ja remondi teenus"
+  },
+  "header": {
+    "login": "Logi sisse",
+    "startSearch": "Alusta otsingut",
+    "openMenu": "Ava peamenüü",
+    "closeMenu": "Sulge menüü",
+    "brand": "CarFix",
+    "nav": {
+      "findService": "Leia autoteenus",
+      "categories": "Kategooriad",
+      "howItWorks": "Kuidas see toimib",
+      "forBusinesses": "Ettevõtetele"
+    }
+  }
+}

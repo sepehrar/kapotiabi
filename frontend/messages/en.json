@@ -1,0 +1,19 @@
+{
+  "home": {
+    "title": "CarFix",
+    "description": "Your trusted car repair service"
+  },
+  "header": {
+    "login": "Log in",
+    "startSearch": "Start search",
+    "openMenu": "Open main menu",
+    "closeMenu": "Close menu",
+    "brand": "CarFix",
+    "nav": {
+      "findService": "Find a service",
+      "categories": "Categories",
+      "howItWorks": "How it works",
+      "forBusinesses": "For businesses"
+    }
+  }
+}
