@@ -1,0 +1,21 @@
+# IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Maven
+backend/target/
+
+# Node / Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/.env*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env files
+.env
+.env.local
