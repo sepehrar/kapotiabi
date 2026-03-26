@@ -1,0 +1,32 @@
+services:
+  db:
+    build: ./db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: kapotiabi
+      POSTGRES_USER: kapotiabi
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/kapotiabi
+      SPRING_DATASOURCE_USERNAME: kapotiabi
+      SPRING_DATASOURCE_PASSWORD:
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
