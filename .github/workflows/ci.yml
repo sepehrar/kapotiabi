@@ -43,21 +43,3 @@ jobs:
           SPRING_DATASOURCE_USERNAME: kapotiabi
           SPRING_DATASOURCE_PASSWORD:
 
-  build-frontend:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Install dependencies
-        working-directory: frontend
-        run: npm ci
-
-      - name: Build
-        working-directory: frontend
-        run: npm run build
