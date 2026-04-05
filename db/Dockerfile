@@ -1,0 +1,5 @@
+FROM postgres:17-alpine
+
+ENV POSTGRES_DB=kapotiabi
+ENV POSTGRES_USER=kapotiabi
+ENV POSTGRES_HOST_AUTH_METHOD=trust
