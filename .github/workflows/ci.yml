@@ -38,8 +38,4 @@ jobs:
       - name: Build and test
         working-directory: backend
         run: bash mvnw verify
-        env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/kapotiabi
-          SPRING_DATASOURCE_USERNAME: kapotiabi
-          SPRING_DATASOURCE_PASSWORD:
 

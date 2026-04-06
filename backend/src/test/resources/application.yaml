@@ -10,3 +10,7 @@ spring:
       ddl-auto: create-drop
   flyway:
     enabled: false
+
+jwt:
+  secret: test-secret-key-min-256-bits-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  expiration-ms: 86400000
