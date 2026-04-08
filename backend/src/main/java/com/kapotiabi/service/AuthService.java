@@ -103,7 +103,7 @@ public class AuthService {
                       .used(false)
                       .build();
               passwordResetTokenRepository.save(resetToken);
-              log.info("Password reset token for {}: {}", req.getEmail(), token);
+              log.info("Password reset requested for {}", req.getEmail());
             });
     return Map.of("message", "If that email exists, a reset link has been sent.");
   }

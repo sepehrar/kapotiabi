@@ -15,7 +15,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,8 +55,14 @@ public class GuestEstimateService {
     BigDecimal overallMin = null;
     BigDecimal overallMax = null;
 
+    List<Long> shopIds = shops.stream().map(RepairShopEntity::getId).toList();
+    Map<Long, List<ShopServiceCategoryEntity>> categoriesByShop =
+        categoryRepository.findByShopIdIn(shopIds).stream()
+            .collect(Collectors.groupingBy(ShopServiceCategoryEntity::getShopId));
+
     for (RepairShopEntity shop : shops) {
-      List<ShopServiceCategoryEntity> categories = categoryRepository.findByShopId(shop.getId());
+      List<ShopServiceCategoryEntity> categories =
+          categoriesByShop.getOrDefault(shop.getId(), List.of());
       if (categories.isEmpty()) {
         continue;
       }

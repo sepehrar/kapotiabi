@@ -103,6 +103,9 @@ public class RepairShopService {
         categoryRepository
             .findById(categoryId)
             .orElseThrow(() -> new NotFoundException("Category not found: " + categoryId));
+    if (!shopId.equals(category.getShopId())) {
+      throw new NotFoundException("Category not found: " + categoryId);
+    }
     category.setCategory(req.category());
     category.setPriceFrom(req.priceFrom());
     category.setPriceTo(req.priceTo());
@@ -113,9 +116,13 @@ public class RepairShopService {
 
   public void deleteCategory(Long shopId, Long categoryId) {
     findOrThrow(shopId);
-    categoryRepository
-        .findById(categoryId)
-        .orElseThrow(() -> new NotFoundException("Category not found: " + categoryId));
+    ShopServiceCategoryEntity category =
+        categoryRepository
+            .findById(categoryId)
+            .orElseThrow(() -> new NotFoundException("Category not found: " + categoryId));
+    if (!shopId.equals(category.getShopId())) {
+      throw new NotFoundException("Category not found: " + categoryId);
+    }
     categoryRepository.deleteById(categoryId);
   }
 

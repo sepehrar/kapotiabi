@@ -5,6 +5,6 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PasswordResetTokenRepository
-    extends JpaRepository<PasswordResetTokenEntity, Integer> {
+    extends JpaRepository<PasswordResetTokenEntity, Long> {
   Optional<PasswordResetTokenEntity> findByToken(String token);
 }
