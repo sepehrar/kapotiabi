@@ -12,6 +12,13 @@ spring:
       ddl-auto: validate
   flyway:
     enabled: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+app:
+  upload-dir: ${APP_UPLOAD_DIR:uploads}
 
 jwt:
   secret: ${JWT_SECRET:dev-secret-key-min-256-bits-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
