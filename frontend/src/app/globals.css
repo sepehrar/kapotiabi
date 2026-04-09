@@ -8,6 +8,9 @@
   --accent: #f44b05;
   --accent-hover: #902d03;
   --accent-foreground: #ffffff;
+
+  --pills-background: #101828;
+  --pills-foreground: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {

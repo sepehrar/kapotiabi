@@ -15,7 +15,7 @@ export default function SearchSummary({ filters }: SearchSummaryProps) {
         {filters.map((filter) => (
           <span
             key={filter}
-            className="rounded-full px-4 py-2 text-sm bg-gray-800 shadow ring-1 ring-inset ring-white/10 "
+            className="rounded-full px-4 py-2 text-sm bg-(--pills-background) shadow ring-1 ring-inset ring-white/10 hover:ring-(--accent)  hover:bg-(--accent)/40  transition-colors duration-300"
           >
             {" "}
             {filter}{" "}

@@ -20,7 +20,7 @@
     "secondaryButton": "Vaata, kuidas see töötab"
   },
   "howItWorks": {
-    "title": "Kuidas see töötab",
+    "title": "Kuidas see töötab 3 lihtsa sammuga",
     "step1Title": "Kirjelda, mida sinu auto vajab",
     "step1Description": "Sisesta vajalik teenus ja oma linn.",
     "step2Title": "Vasta mõnele lühikesele küsimusele",
@@ -42,13 +42,27 @@
   },
   "popularCategories": {
     "title": "Populaarsed teenused",
-    "description": "Alusta teenusest, mida sinu auto kõige rohkem vajab.",
-    "item1": "Õlivahetus",
-    "item2": "Rehviteenus",
-    "item3": "Kliimaseadme hooldus",
-    "item4": "Pidurid",
-    "item5": "Diagnostika",
-    "item6": "Keretööd"
+    "description": "Alusta teenusest, mida sul kõige rohkem vaja on.",
+    "items": [
+      "Autoabi teel",
+      "Hooldus ja diagnostika",
+      "Autoelektritööd",
+      "Keretööd",
+      "Mootor",
+      "Käigukast",
+      "Salongihooldus",
+      "Autoklaasi remont ja vahetus",
+      "Veermik",
+      "Roolisüsteem",
+      "Pidurisüsteem",
+      "Väljalaskesüsteem",
+      "Rehviteenus",
+      "Autokliima remont ja hooldus",
+      "Gaasisüsteemi paigaldus (LPG)",
+      "Mootorrataste remont",
+      "Autokindlustus",
+      "Muu autoremont"
+    ]
   },
   "whyUseCarFix": {
     "title": "Miks kasutada CarFixi",
@@ -171,6 +185,37 @@
       "allFieldsRequired": "Palun täida kõik kohustuslikud väljad.",
       "invalidEmail": "Palun sisesta korrektne e-posti aadress.",
       "generic": "Midagi läks valesti. Palun proovi uuesti."
+    }
+  },
+  "testimonials": {
+    "title": "Mida kasutajad räägivad",
+    "items": [
+      {
+        "quote": "Leidsin rehviteenusele parema hinna vaid mõne minutiga. Palju lihtsam kui töökodadesse ükshaaval helistada.",
+        "author": "Martin K., Tallinn"
+      },
+      {
+        "quote": "Kõige rohkem meeldis mulle see, et sain võrrelda hinda, asukohta ja arvustusi ühes kohas. See tegi valimise palju lihtsamaks.",
+        "author": "Laura P., Tartu"
+      },
+      {
+        "quote": "Sisestasin oma auto andmed ja nägin kiiresti sobivaid teenuseid enda lähedal. Lihtne ja väga mugav.",
+        "author": "Andres V., Pärnu"
+      }
+    ]
+  },
+  "cta": {
+    "title": "Valmis leidma sobiva autoteeninduse?",
+    "description": "Võrdle hindu, asukohta ja usaldusväärseid arvustusi ühes kohas. Loo konto, et salvestada teenindusi, võrrelda valikuid ja saada uuendusi.",
+    "button": "Loo konto"
+  },
+  "searchResultsToolbar": {
+    "matchingServicesSuffix": "sobivat teenust",
+    "sortBy": "Sorteeri",
+    "options": {
+      "price": "Hind",
+      "distance": "Kaugus",
+      "rating": "Hinnang"
     }
   }
 }

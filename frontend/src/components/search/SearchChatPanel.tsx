@@ -59,7 +59,7 @@ export default function SearchChatPanel({
 
             <button
               type="button"
-              className="rounded-full bg-[#f44b05] px-5 py-2 text-sm font-medium text-white transition hover:bg-[#902d03]"
+              className="rounded-full bg-(--accent) px-5 py-2 text-sm font-medium text-white transition hover:bg-(--accent-hover) ring-(--accent)  ring-1 ring-inset"
             >
               Send
             </button>

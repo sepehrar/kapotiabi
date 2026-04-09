@@ -27,7 +27,7 @@ export default function HowItWorks() {
         <div className=" mx-auto  max-w-7xl ">
           <h2
             id="how-it-works-heading"
-            className="text-2xl max-w-xl tracking-tight text-white sm:text-4xl text-balance font-light"
+            className="text-2xl tracking-tight text-white sm:text-3xl text-balance font-light"
           >
             {t("title")}
           </h2>
@@ -37,19 +37,20 @@ export default function HowItWorks() {
           {steps.map((step) => (
             <div
               key={step.number}
-              className="rounded-3xl border border-black/10 bg-[#f8f8f8] p-6 text-left shadow-sm"
+              className=" border-l border-(--accent)/40  text-left "
             >
-              <div className="text-base font-semibold text-[#f44b05]">
+              <div className="-mt-3 text-lg font-semibold text-[#f44b05]">
                 {step.number}
               </div>
+              <div className="p-6">
+                <h3 className="mt-4 text-xl font-semibold text-white">
+                  {step.title}
+                </h3>
 
-              <h3 className="mt-4 text-xl font-semibold text-black">
-                {step.title}
-              </h3>
-
-              <p className="mt-3 text-base leading-7 text-black/70">
-                {step.description}
-              </p>
+                <p className="mt-3 text-base leading-7 text-white/70">
+                  {step.description}
+                </p>
+              </div>
             </div>
           ))}
         </div>
