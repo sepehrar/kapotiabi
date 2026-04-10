@@ -6,7 +6,7 @@ import { getMessages } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 import "../globals.css";
-import Header from "@/components/ui/Header";
+
 import Footer from "@/components/ui/Footer";
 
 const montserrat = Montserrat({
@@ -43,7 +43,6 @@ export default async function RootLayout({
     <html lang={locale} className={`${montserrat.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider messages={messages}>
-          <Header />
           <main>{children}</main>
           <Footer />
         </NextIntlClientProvider>

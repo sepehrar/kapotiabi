@@ -37,7 +37,7 @@ export default function HowItWorks() {
           {steps.map((step) => (
             <div
               key={step.number}
-              className=" border-l border-(--accent)/40  text-left "
+              className=" border-l-2 border-(--accent)/40  text-left "
             >
               <div className="-mt-3 text-lg font-semibold text-[#f44b05]">
                 {step.number}

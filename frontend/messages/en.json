@@ -217,5 +217,25 @@
       "distance": "Distance",
       "rating": "Rating"
     }
+  },
+  "accountSidebar": {
+    "label": "Account",
+    "title": "My account",
+    "openSidebar": "Open sidebar",
+    "closeSidebar": "Close sidebar",
+    "profile": "Your profile",
+    "items": {
+      "dashboard": "Overview",
+      "saved": "Saved services",
+      "compare": "Compare",
+      "searches": "Recent searches",
+      "notifications": "Notifications",
+      "profile": "Profile"
+    },
+    "card": {
+      "title": "Continue searching",
+      "description": "Go back to search, compare more repair shops, and save the best option for later.",
+      "button": "Open search"
+    }
   }
 }
