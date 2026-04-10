@@ -1,6 +1,6 @@
 import Hero from "@/components/landing/Hero";
-import CTA from "@/components/ui/CTA";
-import Testimonials from "@/components/ui/Testimonials";
+import CTA from "@/components/landing/CTA";
+import Testimonials from "@/components/landing/Testimonials";
 import HowItWorks from "@/components/landing/HowItworks";
 import WhatCompare from "@/components/landing/WhatCompare";
 import PopularCategories from "@/components/landing/PopularCategories";
@@ -17,19 +17,13 @@ export default function Home() {
       {" "}
       <Hero />
       <HowItWorks />
-      <WhatCompare />
       <PopularCategories />
+      <WhatCompare />
       <WhyUseCarFix />
       <ForBusinesses />
       <FAQ />
-      <div className="bg-white">
-        {/* <div className="flex flex-col flex-1 items-center justify-center bg-zinc-500 font-sans dark:bg-black">
-          <h1>{t("title")}</h1>
-          <p>{t("description")}</p>
-        </div>{" "} */}
-        <Testimonials />
-        <CTA />
-      </div>
+      <Testimonials />
+      <CTA />
     </>
   );
 }

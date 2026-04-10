@@ -34,7 +34,7 @@ export default function Hero() {
             <div className="flex gap-12 items-center">
               <Link
                 href="/search"
-                className="mt-8 block w-full rounded-full border border-transparent bg-[#f44b05] px-8 py-3 text-base font-medium text-white hover:bg-[#902d03] sm:w-auto"
+                className="mt-8 block w-full rounded-full border border-transparent bg-(--accent) px-8 py-3 text-base font-medium text-white hover:bg-(--accent-hover) sm:w-auto ring-(--accent)  ring-1 ring-inset"
               >
                 {t("button")}
               </Link>

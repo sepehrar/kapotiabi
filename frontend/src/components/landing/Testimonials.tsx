@@ -1,43 +1,31 @@
-const testimonials = [
-  {
-    id: 1,
-    quote:
-      "My order arrived super quickly. The product is even better than I hoped it would be. Very happy customer over here!",
-    attribution: "Sarah Peters, New Orleans",
-  },
-  {
-    id: 2,
-    quote:
-      "I had to return a purchase that didn’t fit. The whole process was so simple that I ended up ordering two new items!",
-    attribution: "Kelly McPherson, Chicago",
-  },
-  {
-    id: 3,
-    quote:
-      "Now that I’m on holiday for the summer, I’ll probably order a few more shirts. It’s just so convenient, and I know the quality will always be there.",
-    attribution: "Chris Paul, Phoenix",
-  },
-];
+import { useTranslations } from "next-intl";
+
+type TestimonialItem = {
+  quote: string;
+  author: string;
+};
 
 export default function Testimonials() {
+  const t = useTranslations("testimonials");
+  const testimonials = t.raw("items") as TestimonialItem[];
+
   return (
-    <>
-      {/* Testimonials */}
+    <div className="bg-white">
       <section
         aria-labelledby="testimonial-heading"
-        className="relative mx-auto max-w-7xl px-4 pt-20 sm:px-6 lg:px-8  bg-white"
+        className="relative mx-auto max-w-7xl px-4 pt-20 sm:px-6 lg:px-8"
       >
         <div className="mx-auto max-w-2xl lg:max-w-none">
           <h2
             id="testimonial-heading"
             className="text-2xl font-bold tracking-tight text-gray-900"
           >
-            What are people saying?
+            {t("title")}
           </h2>
 
           <div className="mt-16 space-y-16 lg:grid lg:grid-cols-3 lg:gap-x-8 lg:space-y-0">
-            {testimonials.map((testimonial) => (
-              <blockquote key={testimonial.id} className="sm:flex lg:block">
+            {testimonials.map((testimonial, index) => (
+              <blockquote key={index} className="sm:flex lg:block">
                 <svg
                   width={24}
                   height={18}
@@ -53,7 +41,7 @@ export default function Testimonials() {
                 <div className="mt-8 sm:ml-6 sm:mt-0 lg:ml-0 lg:mt-10">
                   <p className="text-lg text-gray-600">{testimonial.quote}</p>
                   <cite className="mt-4 block font-semibold not-italic text-gray-900">
-                    {testimonial.attribution}
+                    {testimonial.author}
                   </cite>
                 </div>
               </blockquote>
@@ -61,6 +49,6 @@ export default function Testimonials() {
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }

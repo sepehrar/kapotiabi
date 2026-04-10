@@ -41,14 +41,28 @@
     "item4Description": "See when each price was last updated before making your choice."
   },
   "popularCategories": {
-    "title": "Popular services",
-    "description": "Start with the service you need most.",
-    "item1": "Oil change",
-    "item2": "Tire service",
-    "item3": "A/C service",
-    "item4": "Brakes",
-    "item5": "Diagnostics",
-    "item6": "Bodywork"
+    "title": "Popular services.",
+    "description": "Start with the service you need most",
+    "items": [
+      "Roadside assistance",
+      "Maintenance and diagnostics",
+      "Auto electrics",
+      "Bodywork",
+      "Engine",
+      "Transmission",
+      "Interior care",
+      "Auto glass repair and replacement",
+      "Suspension",
+      "Steering system",
+      "Brake system",
+      "Exhaust system",
+      "Tire service",
+      "Car air conditioning repair and maintenance",
+      "LPG system installation",
+      "Motorcycle repair",
+      "Car insurance",
+      "Other car repairs"
+    ]
   },
   "whyUseCarFix": {
     "title": "Why use CarFix",
@@ -171,6 +185,57 @@
       "allFieldsRequired": "Please fill in all required fields.",
       "invalidEmail": "Please enter a valid email address.",
       "generic": "Something went wrong. Please try again."
+    }
+  },
+  "testimonials": {
+    "title": "What users say",
+    "items": [
+      {
+        "quote": "I found a better price for tire service in just a few minutes. Much easier than calling repair shops one by one.",
+        "author": "Martin K., Tallinn"
+      },
+      {
+        "quote": "The best part was being able to compare price, location, and reviews in one place. It made choosing much easier.",
+        "author": "Laura P., Tartu"
+      },
+      {
+        "quote": "I entered my car details and quickly saw matching service options nearby. Simple and very convenient.",
+        "author": "Andres V., Pärnu"
+      }
+    ]
+  },
+  "cta": {
+    "title": "Ready to find the right car service?",
+    "description": "Compare prices, location, and trusted reviews in one place. Create an account to save shops, compare options, and get updates.",
+    "button": "Create account"
+  },
+  "searchResultsToolbar": {
+    "matchingServicesSuffix": "matching services",
+    "sortBy": "Sort by",
+    "options": {
+      "price": "Price",
+      "distance": "Distance",
+      "rating": "Rating"
+    }
+  },
+  "accountSidebar": {
+    "label": "Account",
+    "title": "My account",
+    "openSidebar": "Open sidebar",
+    "closeSidebar": "Close sidebar",
+    "profile": "Your profile",
+    "items": {
+      "dashboard": "Overview",
+      "saved": "Saved services",
+      "compare": "Compare",
+      "searches": "Recent searches",
+      "notifications": "Notifications",
+      "profile": "Profile"
+    },
+    "card": {
+      "title": "Continue searching",
+      "description": "Go back to search, compare more repair shops, and save the best option for later.",
+      "button": "Open search"
     }
   }
 }
