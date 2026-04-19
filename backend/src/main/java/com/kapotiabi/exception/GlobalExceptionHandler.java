@@ -19,6 +19,12 @@ public class GlobalExceptionHandler {
     return error(HttpStatus.CONFLICT, ex.getMessage(), req.getRequestURI());
   }
 
+  @ExceptionHandler(AlreadySavedException.class)
+  public ResponseEntity<Map<String, Object>> handleAlreadySaved(
+      AlreadySavedException ex, HttpServletRequest req) {
+    return error(HttpStatus.CONFLICT, ex.getMessage(), req.getRequestURI());
+  }
+
   @ExceptionHandler(InvalidCredentialsException.class)
   public ResponseEntity<Map<String, Object>> handleInvalidCredentials(
       InvalidCredentialsException ex, HttpServletRequest req) {
