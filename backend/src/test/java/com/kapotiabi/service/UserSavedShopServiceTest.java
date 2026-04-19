@@ -139,8 +139,7 @@ class UserSavedShopServiceTest {
 
   @Test
   void unsave_success_deletesRecord() {
-    when(savedShopRepository.findByUserIdAndShopId(5L, 10L))
-        .thenReturn(Optional.of(buildSaved()));
+    when(savedShopRepository.findByUserIdAndShopId(5L, 10L)).thenReturn(Optional.of(buildSaved()));
 
     userSavedShopService.unsave(5L, 10L);
 

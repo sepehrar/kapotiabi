@@ -39,15 +39,13 @@ public class UserSavedShopController {
   public ResponseEntity<SavedShopResponse> save(
       @PathVariable Long userId, @PathVariable Long shopId) {
     SavedShopResponse saved = userSavedShopService.save(userId, shopId);
-    URI location =
-        ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
+    URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
     return ResponseEntity.created(location).body(saved);
   }
 
   @DeleteMapping("/{shopId}")
   @Operation(summary = "Remove a saved shop for a user")
-  public ResponseEntity<Void> unsave(
-      @PathVariable Long userId, @PathVariable Long shopId) {
+  public ResponseEntity<Void> unsave(@PathVariable Long userId, @PathVariable Long shopId) {
     userSavedShopService.unsave(userId, shopId);
     return ResponseEntity.noContent().build();
   }

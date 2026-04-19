@@ -44,8 +44,14 @@ class UserSavedShopControllerTest {
   }
 
   private SavedShopResponse buildResponse() {
-    return new SavedShopResponse(10L, "AutoExpert Tallinn", "Tallinn", "Harju",
-        "+372 555 1234", "active", LocalDateTime.now());
+    return new SavedShopResponse(
+        10L,
+        "AutoExpert Tallinn",
+        "Tallinn",
+        "Harju",
+        "+372 555 1234",
+        "active",
+        LocalDateTime.now());
   }
 
   private PagedResponse<SavedShopResponse> buildPagedResponse(List<SavedShopResponse> content) {
@@ -85,8 +91,7 @@ class UserSavedShopControllerTest {
 
   @Test
   void getSaved_emptyList_returns200() throws Exception {
-    when(userSavedShopService.getSaved(5L, 0, 10))
-        .thenReturn(buildPagedResponse(List.of()));
+    when(userSavedShopService.getSaved(5L, 0, 10)).thenReturn(buildPagedResponse(List.of()));
 
     mockMvc
         .perform(get("/api/v1/users/5/saved-shops"))
@@ -110,8 +115,7 @@ class UserSavedShopControllerTest {
 
   @Test
   void save_shopNotFound_returns404() throws Exception {
-    when(userSavedShopService.save(5L, 99L))
-        .thenThrow(new NotFoundException("Shop not found: 99"));
+    when(userSavedShopService.save(5L, 99L)).thenThrow(new NotFoundException("Shop not found: 99"));
 
     mockMvc
         .perform(post("/api/v1/users/5/saved-shops/99"))
@@ -135,15 +139,14 @@ class UserSavedShopControllerTest {
   void unsave_returns204() throws Exception {
     doNothing().when(userSavedShopService).unsave(5L, 10L);
 
-    mockMvc
-        .perform(delete("/api/v1/users/5/saved-shops/10"))
-        .andExpect(status().isNoContent());
+    mockMvc.perform(delete("/api/v1/users/5/saved-shops/10")).andExpect(status().isNoContent());
   }
 
   @Test
   void unsave_notFound_returns404() throws Exception {
     doThrow(new NotFoundException("Saved shop not found"))
-        .when(userSavedShopService).unsave(5L, 10L);
+        .when(userSavedShopService)
+        .unsave(5L, 10L);
 
     mockMvc
         .perform(delete("/api/v1/users/5/saved-shops/10"))

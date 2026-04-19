@@ -24,27 +24,37 @@ public class UserSavedShopService {
   public PagedResponse<SavedShopResponse> getSaved(Long userId, int page, int size) {
     var pageable = PageRequest.of(page, size, Sort.by("savedAt").descending());
     return PagedResponse.from(
-        savedShopRepository.findByUserId(userId, pageable).map(saved -> {
-          RepairShopEntity shop = repairShopRepository.findById(saved.getShopId())
-              .orElseThrow(() -> new NotFoundException("Shop not found: " + saved.getShopId()));
-          return SavedShopResponse.from(saved, shop);
-        }));
+        savedShopRepository
+            .findByUserId(userId, pageable)
+            .map(
+                saved -> {
+                  RepairShopEntity shop =
+                      repairShopRepository
+                          .findById(saved.getShopId())
+                          .orElseThrow(
+                              () -> new NotFoundException("Shop not found: " + saved.getShopId()));
+                  return SavedShopResponse.from(saved, shop);
+                }));
   }
 
   public SavedShopResponse save(Long userId, Long shopId) {
-    RepairShopEntity shop = repairShopRepository.findById(shopId)
-        .orElseThrow(() -> new NotFoundException("Shop not found: " + shopId));
+    RepairShopEntity shop =
+        repairShopRepository
+            .findById(shopId)
+            .orElseThrow(() -> new NotFoundException("Shop not found: " + shopId));
     if (savedShopRepository.existsByUserIdAndShopId(userId, shopId)) {
       throw new AlreadySavedException();
     }
-    UserSavedShopEntity saved = savedShopRepository.save(
-        UserSavedShopEntity.builder().userId(userId).shopId(shopId).build());
+    UserSavedShopEntity saved =
+        savedShopRepository.save(
+            UserSavedShopEntity.builder().userId(userId).shopId(shopId).build());
     return SavedShopResponse.from(saved, shop);
   }
 
   @Transactional
   public void unsave(Long userId, Long shopId) {
-    savedShopRepository.findByUserIdAndShopId(userId, shopId)
+    savedShopRepository
+        .findByUserIdAndShopId(userId, shopId)
         .orElseThrow(() -> new NotFoundException("Saved shop not found"));
     savedShopRepository.deleteByUserIdAndShopId(userId, shopId);
   }
