@@ -8,6 +8,8 @@ import com.kapotiabi.exception.AlreadySavedException;
 import com.kapotiabi.exception.NotFoundException;
 import com.kapotiabi.repository.RepairShopRepository;
 import com.kapotiabi.repository.UserSavedShopRepository;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,20 +25,21 @@ public class UserSavedShopService {
 
   public PagedResponse<SavedShopResponse> getSaved(Long userId, int page, int size) {
     var pageable = PageRequest.of(page, size, Sort.by("savedAt").descending());
+    var savedPage = savedShopRepository.findByUserId(userId, pageable);
+    var shopIds = savedPage.getContent().stream().map(UserSavedShopEntity::getShopId).toList();
+    var shopMap =
+        repairShopRepository.findAllById(shopIds).stream()
+            .collect(Collectors.toMap(RepairShopEntity::getId, Function.identity()));
     return PagedResponse.from(
-        savedShopRepository
-            .findByUserId(userId, pageable)
-            .map(
-                saved -> {
-                  RepairShopEntity shop =
-                      repairShopRepository
-                          .findById(saved.getShopId())
-                          .orElseThrow(
-                              () -> new NotFoundException("Shop not found: " + saved.getShopId()));
-                  return SavedShopResponse.from(saved, shop);
-                }));
+        savedPage.map(
+            saved -> {
+              RepairShopEntity shop = shopMap.get(saved.getShopId());
+              if (shop == null) throw new NotFoundException("Shop not found: " + saved.getShopId());
+              return SavedShopResponse.from(saved, shop);
+            }));
   }
 
+  @Transactional
   public SavedShopResponse save(Long userId, Long shopId) {
     RepairShopEntity shop =
         repairShopRepository

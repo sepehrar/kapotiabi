@@ -63,7 +63,7 @@ class UserSavedShopServiceTest {
     RepairShopEntity shop = buildShop();
     when(savedShopRepository.findByUserId(any(Long.class), any(Pageable.class)))
         .thenReturn(new PageImpl<>(List.of(saved), PageRequest.of(0, 10), 1));
-    when(repairShopRepository.findById(10L)).thenReturn(Optional.of(shop));
+    when(repairShopRepository.findAllById(List.of(10L))).thenReturn(List.of(shop));
 
     PagedResponse<SavedShopResponse> result = userSavedShopService.getSaved(5L, 0, 10);
 
@@ -92,7 +92,7 @@ class UserSavedShopServiceTest {
     UserSavedShopEntity saved = buildSaved();
     when(savedShopRepository.findByUserId(any(Long.class), any(Pageable.class)))
         .thenReturn(new PageImpl<>(List.of(saved), PageRequest.of(0, 10), 1));
-    when(repairShopRepository.findById(10L)).thenReturn(Optional.empty());
+    when(repairShopRepository.findAllById(List.of(10L))).thenReturn(List.of());
 
     assertThatThrownBy(() -> userSavedShopService.getSaved(5L, 0, 10))
         .isInstanceOf(NotFoundException.class)

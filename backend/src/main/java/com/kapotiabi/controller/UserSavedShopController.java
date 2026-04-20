@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
@@ -26,6 +27,7 @@ public class UserSavedShopController {
   private final UserSavedShopService userSavedShopService;
 
   @GetMapping
+  @PreAuthorize("authentication.principal == #userId.toString()")
   @Operation(summary = "Get saved shops for a user")
   public ResponseEntity<PagedResponse<SavedShopResponse>> getSaved(
       @PathVariable Long userId,
@@ -35,6 +37,7 @@ public class UserSavedShopController {
   }
 
   @PostMapping("/{shopId}")
+  @PreAuthorize("authentication.principal == #userId.toString()")
   @Operation(summary = "Save a shop for a user")
   public ResponseEntity<SavedShopResponse> save(
       @PathVariable Long userId, @PathVariable Long shopId) {
@@ -44,6 +47,7 @@ public class UserSavedShopController {
   }
 
   @DeleteMapping("/{shopId}")
+  @PreAuthorize("authentication.principal == #userId.toString()")
   @Operation(summary = "Remove a saved shop for a user")
   public ResponseEntity<Void> unsave(@PathVariable Long userId, @PathVariable Long shopId) {
     userSavedShopService.unsave(userId, shopId);
