@@ -5,12 +5,18 @@ Car repair marketplace for Estonia. Car owners describe their problem, get price
 ## Documentation
 
 - [Authentication (login, register, password reset)](docs/auth.md)
+- [Saved Shops (bookmarks)](docs/saved-shops.md)
 
 Auth endpoints:
 - `POST /api/v1/auth/register` — register a new user
 - `POST /api/v1/auth/login` — log in and receive a JWT token
 - `POST /api/v1/auth/forgot-password` — request a password reset email
 - `POST /api/v1/auth/reset-password` — reset password using a token
+
+Saved shops endpoints:
+- `GET /api/v1/users/{userId}/saved-shops` — list saved shops
+- `POST /api/v1/users/{userId}/saved-shops/{shopId}` — save a shop
+- `DELETE /api/v1/users/{userId}/saved-shops/{shopId}` — remove a saved shop
 
 ## Running Locally
 
