@@ -10,7 +10,6 @@ import com.kapotiabi.dto.response.PagedResponse;
 import com.kapotiabi.dto.response.SavedShopResponse;
 import com.kapotiabi.entity.RepairShopEntity;
 import com.kapotiabi.entity.UserSavedShopEntity;
-import com.kapotiabi.exception.AlreadySavedException;
 import com.kapotiabi.exception.NotFoundException;
 import com.kapotiabi.repository.RepairShopRepository;
 import com.kapotiabi.repository.UserSavedShopRepository;
@@ -22,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -106,7 +106,6 @@ class UserSavedShopServiceTest {
     RepairShopEntity shop = buildShop();
     UserSavedShopEntity saved = buildSaved();
     when(repairShopRepository.findById(10L)).thenReturn(Optional.of(shop));
-    when(savedShopRepository.existsByUserIdAndShopId(5L, 10L)).thenReturn(false);
     when(savedShopRepository.save(any(UserSavedShopEntity.class))).thenReturn(saved);
 
     SavedShopResponse response = userSavedShopService.save(5L, 10L);
@@ -126,13 +125,13 @@ class UserSavedShopServiceTest {
   }
 
   @Test
-  void save_alreadySaved_throwsAlreadySavedException() {
+  void save_alreadySaved_propagatesDataIntegrityViolation() {
     when(repairShopRepository.findById(10L)).thenReturn(Optional.of(buildShop()));
-    when(savedShopRepository.existsByUserIdAndShopId(5L, 10L)).thenReturn(true);
+    when(savedShopRepository.save(any(UserSavedShopEntity.class)))
+        .thenThrow(new DataIntegrityViolationException("duplicate key"));
 
     assertThatThrownBy(() -> userSavedShopService.save(5L, 10L))
-        .isInstanceOf(AlreadySavedException.class)
-        .hasMessage("Shop already saved");
+        .isInstanceOf(DataIntegrityViolationException.class);
   }
 
   // ── unsave ────────────────────────────────────────────────────────────────
