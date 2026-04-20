@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -23,6 +24,12 @@ public class GlobalExceptionHandler {
   public ResponseEntity<Map<String, Object>> handleAlreadySaved(
       AlreadySavedException ex, HttpServletRequest req) {
     return error(HttpStatus.CONFLICT, ex.getMessage(), req.getRequestURI());
+  }
+
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  public ResponseEntity<Map<String, Object>> handleDataIntegrityViolation(
+      DataIntegrityViolationException ex, HttpServletRequest req) {
+    return error(HttpStatus.CONFLICT, "Shop already saved", req.getRequestURI());
   }
 
   @ExceptionHandler(InvalidCredentialsException.class)

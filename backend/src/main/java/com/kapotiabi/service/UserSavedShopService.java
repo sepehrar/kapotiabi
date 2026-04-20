@@ -4,7 +4,6 @@ import com.kapotiabi.dto.response.PagedResponse;
 import com.kapotiabi.dto.response.SavedShopResponse;
 import com.kapotiabi.entity.RepairShopEntity;
 import com.kapotiabi.entity.UserSavedShopEntity;
-import com.kapotiabi.exception.AlreadySavedException;
 import com.kapotiabi.exception.NotFoundException;
 import com.kapotiabi.repository.RepairShopRepository;
 import com.kapotiabi.repository.UserSavedShopRepository;
@@ -45,9 +44,6 @@ public class UserSavedShopService {
         repairShopRepository
             .findById(shopId)
             .orElseThrow(() -> new NotFoundException("Shop not found: " + shopId));
-    if (savedShopRepository.existsByUserIdAndShopId(userId, shopId)) {
-      throw new AlreadySavedException();
-    }
     UserSavedShopEntity saved =
         savedShopRepository.save(
             UserSavedShopEntity.builder().userId(userId).shopId(shopId).build());
