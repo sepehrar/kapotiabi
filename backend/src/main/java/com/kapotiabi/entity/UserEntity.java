@@ -44,6 +44,15 @@ public class UserEntity {
 
   private String phone;
 
+  @Column(name = "preferred_city")
+  private String preferredCity;
+
+  @Column(name = "search_radius_km")
+  private Integer searchRadiusKm;
+
+  @Column(name = "parts_quality_preference")
+  private String partsQualityPreference;
+
   @Column(name = "created_at")
   private LocalDateTime createdAt;
 

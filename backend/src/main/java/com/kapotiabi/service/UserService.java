@@ -24,6 +24,10 @@ public class UserService {
     user.setFirstName(req.firstName());
     user.setLastName(req.lastName());
     user.setPhone(req.phone());
+    user.setPreferredCity(req.preferredCity());
+    user.setSearchRadiusKm(req.searchRadiusKm());
+    user.setPartsQualityPreference(
+        req.partsQualityPreference() != null ? req.partsQualityPreference().getValue() : null);
     user.setUpdatedAt(LocalDateTime.now());
     return UserResponse.from(userRepository.save(user));
   }
