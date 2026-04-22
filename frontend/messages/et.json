@@ -106,6 +106,13 @@
   "register": {
     "title": "Loo oma konto",
     "description": "Registreeru, et kasutada platvormi ja leida töökodasid kiiremini.",
+    "role": {
+      "label": "Registreerin kasutajana",
+      "carOwner": "Auto omanik",
+      "shopOwner": "Remonditöökoja omanik",
+      "carOwnerHint": "Soovin oma autole remondipakkumisi",
+      "shopOwnerHint": "Soovin saada klientide päringuid"
+    },
     "fields": {
       "firstName": {
         "label": "Eesnimi",
