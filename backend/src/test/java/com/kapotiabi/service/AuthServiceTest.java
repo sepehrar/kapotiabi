@@ -417,7 +417,9 @@ class AuthServiceTest {
     when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
     assertThatThrownBy(
-            () -> authService.changePassword(1L, new ChangePasswordRequest("WrongPass", "NewPass456")))
+            () ->
+                authService.changePassword(
+                    1L, new ChangePasswordRequest("WrongPass", "NewPass456")))
         .isInstanceOf(InvalidCredentialsException.class)
         .hasMessage("Current password is incorrect");
 
@@ -429,7 +431,8 @@ class AuthServiceTest {
     when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
     assertThatThrownBy(
-            () -> authService.changePassword(99L, new ChangePasswordRequest("OldPass", "NewPass456")))
+            () ->
+                authService.changePassword(99L, new ChangePasswordRequest("OldPass", "NewPass456")))
         .isInstanceOf(NotFoundException.class)
         .hasMessageContaining("99");
   }
