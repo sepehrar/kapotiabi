@@ -194,6 +194,12 @@
       "generic": "Midagi läks valesti. Palun proovi uuesti."
     }
   },
+  "authMenu": {
+    "account": "Minu konto",
+    "business": "Äri",
+    "businessDashboard": "Äri juhtpaneel",
+    "logout": "Logi välja"
+  },
   "testimonials": {
     "title": "Mida kasutajad räägivad",
     "items": [

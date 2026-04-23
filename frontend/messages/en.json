@@ -194,6 +194,12 @@
       "generic": "Something went wrong. Please try again."
     }
   },
+  "authMenu": {
+    "account": "My account",
+    "business": "Business",
+    "businessDashboard": "Business dashboard",
+    "logout": "Log out"
+  },
   "testimonials": {
     "title": "What users say",
     "items": [

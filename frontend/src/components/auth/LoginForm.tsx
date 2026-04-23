@@ -1,4 +1,3 @@
-// frontend\src\components\auth\LoginForm.tsx
 "use client";
 
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
@@ -85,6 +84,7 @@ export default function LoginForm() {
 
       if (data && "token" in data && data.token) {
         sessionStorage.setItem("authToken", data.token);
+        sessionStorage.setItem("authRole", data.role);
       }
 
       router.push("/");
@@ -100,8 +100,8 @@ export default function LoginForm() {
 
   return (
     <section className="bg-black">
-      <div className="mx-auto grid  max-w-7xl lg:grid-cols-2">
-        <div className="flex items-start px-6 sm:pt-20 pb-20 lg:pb-52 lg:px-8 lg:justify-start justify-center">
+      <div className="mx-auto grid max-w-7xl lg:grid-cols-2">
+        <div className="flex items-start justify-center px-6 pb-20 sm:pt-20 lg:justify-start lg:px-8 lg:pb-52">
           <div className="w-full max-w-xl lg:max-w-lg">
             <SectionTitle title={t("title")} description={t("description")} />
 
@@ -192,7 +192,7 @@ export default function LoginForm() {
           </div>
         </div>
 
-        <div className="relative min-h-40 lg:block hidden">
+        <div className="relative min-h-40 hidden lg:block">
           <Image
             alt="Car workshop"
             src="/img/vidhi00.jpg"
