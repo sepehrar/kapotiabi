@@ -26,8 +26,7 @@ public class UserService {
     user.setPhone(req.phone());
     user.setPreferredCity(req.preferredCity());
     user.setSearchRadiusKm(req.searchRadiusKm());
-    user.setPartsQualityPreference(
-        req.partsQualityPreference() != null ? req.partsQualityPreference().getValue() : null);
+    user.setPartsQualityPreference(req.partsQualityPreference());
     user.setUpdatedAt(LocalDateTime.now());
     return UserResponse.from(userRepository.save(user));
   }

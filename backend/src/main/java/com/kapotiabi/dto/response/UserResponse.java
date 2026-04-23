@@ -1,6 +1,7 @@
 package com.kapotiabi.dto.response;
 
 import com.kapotiabi.entity.UserEntity;
+import com.kapotiabi.enums.PartsQuality;
 import java.time.LocalDateTime;
 
 public record UserResponse(
@@ -12,7 +13,7 @@ public record UserResponse(
     String phone,
     String preferredCity,
     Integer searchRadiusKm,
-    String partsQualityPreference,
+    PartsQuality partsQualityPreference,
     LocalDateTime createdAt) {
   public static UserResponse from(UserEntity u) {
     return new UserResponse(

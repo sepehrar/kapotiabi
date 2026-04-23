@@ -77,6 +77,6 @@ class UserServiceTest {
     assertThat(response.phone()).isEqualTo("555-9999");
     assertThat(response.preferredCity()).isEqualTo("Tallinn");
     assertThat(response.searchRadiusKm()).isEqualTo(10);
-    assertThat(response.partsQualityPreference()).isEqualTo("oem");
+    assertThat(response.partsQualityPreference()).isEqualTo(PartsQuality.OEM);
   }
 }
