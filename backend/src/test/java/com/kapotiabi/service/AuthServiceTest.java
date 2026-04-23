@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import com.kapotiabi.dto.*;
+import com.kapotiabi.dto.request.ChangePasswordRequest;
 import com.kapotiabi.entity.PasswordResetTokenEntity;
 import com.kapotiabi.entity.RepairShopEntity;
 import com.kapotiabi.entity.UserEntity;
@@ -12,6 +13,7 @@ import com.kapotiabi.enums.UserRole;
 import com.kapotiabi.exception.DuplicateEmailException;
 import com.kapotiabi.exception.InvalidCredentialsException;
 import com.kapotiabi.exception.InvalidTokenException;
+import com.kapotiabi.exception.NotFoundException;
 import com.kapotiabi.repository.PasswordResetTokenRepository;
 import com.kapotiabi.repository.RepairShopRepository;
 import com.kapotiabi.repository.UserRepository;
@@ -378,6 +380,58 @@ class AuthServiceTest {
     assertThatThrownBy(() -> authService.resetPassword(req))
         .isInstanceOf(InvalidTokenException.class)
         .hasMessage("Reset token has already been used");
+  }
+
+  // ── Change password ───────────────────────────────────────────────────────
+
+  @Test
+  void changePassword_success_updatesHash() {
+    String oldHash = passwordEncoder.encode("OldPass123");
+    UserEntity user =
+        UserEntity.builder()
+            .id(1L)
+            .email("user@test.ee")
+            .passwordHash(oldHash)
+            .role(UserRole.CAR_OWNER)
+            .build();
+    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+    when(userRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+    authService.changePassword(1L, new ChangePasswordRequest("OldPass123", "NewPass456"));
+
+    ArgumentCaptor<UserEntity> captor = ArgumentCaptor.forClass(UserEntity.class);
+    verify(userRepository).save(captor.capture());
+    assertThat(passwordEncoder.matches("NewPass456", captor.getValue().getPasswordHash())).isTrue();
+  }
+
+  @Test
+  void changePassword_wrongCurrentPassword_throwsInvalidCredentials() {
+    String hash = passwordEncoder.encode("CorrectPass");
+    UserEntity user =
+        UserEntity.builder()
+            .id(1L)
+            .email("user@test.ee")
+            .passwordHash(hash)
+            .role(UserRole.CAR_OWNER)
+            .build();
+    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+    assertThatThrownBy(
+            () -> authService.changePassword(1L, new ChangePasswordRequest("WrongPass", "NewPass456")))
+        .isInstanceOf(InvalidCredentialsException.class)
+        .hasMessage("Current password is incorrect");
+
+    verify(userRepository, never()).save(any());
+  }
+
+  @Test
+  void changePassword_userNotFound_throwsNotFoundException() {
+    when(userRepository.findById(99L)).thenReturn(Optional.empty());
+
+    assertThatThrownBy(
+            () -> authService.changePassword(99L, new ChangePasswordRequest("OldPass", "NewPass456")))
+        .isInstanceOf(NotFoundException.class)
+        .hasMessageContaining("99");
   }
 
   @Test

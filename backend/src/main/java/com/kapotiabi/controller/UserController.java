@@ -1,13 +1,16 @@
 package com.kapotiabi.controller;
 
+import com.kapotiabi.dto.request.ChangePasswordRequest;
 import com.kapotiabi.dto.request.UpdateUserRequest;
 import com.kapotiabi.dto.response.UserResponse;
+import com.kapotiabi.service.AuthService;
 import com.kapotiabi.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Users", description = "User profile management")
 public class UserController {
 
+  private final AuthService authService;
   private final UserService userService;
 
   @GetMapping("/{id}")
@@ -34,5 +38,15 @@ public class UserController {
   public ResponseEntity<UserResponse> update(
       @PathVariable Long id, @Valid @RequestBody UpdateUserRequest req) {
     return ResponseEntity.ok(userService.update(id, req));
+  }
+
+  @PutMapping("/me/password")
+  @Operation(summary = "Change current user's password")
+  public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest req) {
+    Long userId =
+        Long.parseLong(
+            (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+    authService.changePassword(userId, req);
+    return ResponseEntity.noContent().build();
   }
 }
