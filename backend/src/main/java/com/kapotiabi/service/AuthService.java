@@ -1,7 +1,7 @@
 package com.kapotiabi.service;
 
 import com.kapotiabi.dto.*;
-import com.kapotiabi.dto.request.ChangePasswordRequest;
+import com.kapotiabi.dto.ChangePasswordRequest;
 import com.kapotiabi.entity.PasswordResetTokenEntity;
 import com.kapotiabi.entity.RepairShopEntity;
 import com.kapotiabi.entity.UserEntity;
@@ -149,6 +149,7 @@ public class AuthService {
       throw new InvalidCredentialsException("Current password is incorrect");
     }
 
+    // TODO: reject if newPassword == currentPassword
     user.setPasswordHash(passwordEncoder.encode(req.newPassword()));
     userRepository.save(user);
   }

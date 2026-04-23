@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import com.kapotiabi.dto.*;
-import com.kapotiabi.dto.request.ChangePasswordRequest;
 import com.kapotiabi.entity.PasswordResetTokenEntity;
 import com.kapotiabi.entity.RepairShopEntity;
 import com.kapotiabi.entity.UserEntity;

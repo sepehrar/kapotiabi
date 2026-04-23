@@ -7,6 +7,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -36,5 +37,14 @@ public class AuthController {
   public ResponseEntity<Map<String, String>> resetPassword(
       @Valid @RequestBody ResetPasswordRequest req) {
     return ResponseEntity.ok(authService.resetPassword(req));
+  }
+
+  @PutMapping("/me/password")
+  public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest req) {
+    Long userId =
+        Long.parseLong(
+            (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+    authService.changePassword(userId, req);
+    return ResponseEntity.noContent().build();
   }
 }
