@@ -1,5 +1,6 @@
 package com.kapotiabi.entity;
 
+import com.kapotiabi.enums.PartsQuality;
 import com.kapotiabi.enums.UserRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,6 +44,16 @@ public class UserEntity {
   private String lastName;
 
   private String phone;
+
+  @Column(name = "preferred_city")
+  private String preferredCity;
+
+  @Builder.Default
+  @Column(name = "search_radius_km")
+  private Integer searchRadiusKm = 10;
+
+  @Column(name = "parts_quality_preference")
+  private PartsQuality partsQualityPreference;
 
   @Column(name = "created_at")
   private LocalDateTime createdAt;
