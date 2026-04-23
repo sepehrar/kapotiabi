@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
   Dialog,
@@ -19,6 +19,7 @@ import {
   CreditCardIcon,
   Cog6ToothIcon,
   XMarkIcon,
+  ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import LocaleSwitcher from "@/components/ui/LocaleSwitcher";
 
@@ -48,10 +49,18 @@ function isActivePath(pathname: string, href: string) {
 type SidebarContentProps = {
   pathname: string;
   t: ReturnType<typeof useTranslations<"businessSidebar">>;
+  logoutT: ReturnType<typeof useTranslations<"authMenu">>;
+  onLogout: () => void;
   onNavigate?: () => void;
 };
 
-function SidebarContent({ pathname, t, onNavigate }: SidebarContentProps) {
+function SidebarContent({
+  pathname,
+  t,
+  logoutT,
+  onLogout,
+  onNavigate,
+}: SidebarContentProps) {
   return (
     <>
       <div className="relative flex h-16 shrink-0 items-center justify-between ">
@@ -122,11 +131,25 @@ function SidebarContent({ pathname, t, onNavigate }: SidebarContentProps) {
 
               <Link
                 href="/business/listing"
-                className="mt-4 inline-flex items-center justify-center rounded-full bg-(--accent) px-4 py-2 text-sm font-semibold text-(--accent-foreground) transition hover:bg-(--accent-hover) text-nowrap ring-1 ring-inset ring-(--accent)"
+                className="mt-4 inline-flex items-center justify-center rounded-full bg-(--accent) px-4 py-2 text-sm font-semibold text-(--accent-foreground) text-nowrap ring-1 ring-inset ring-(--accent) transition hover:bg-(--accent-hover)"
               >
                 {t("card.button")}
               </Link>
             </div>
+          </li>
+
+          <li>
+            <button
+              type="button"
+              onClick={onLogout}
+              className="group -mx-2 flex w-full items-center gap-x-3 rounded-2xl px-3 py-3 text-sm text-white/70 transition hover:bg-(--pills-background) hover:text-white"
+            >
+              <ArrowRightOnRectangleIcon
+                aria-hidden="true"
+                className="size-4 shrink-0 text-white/40 transition group-hover:text-white"
+              />
+              {logoutT("logout")}
+            </button>
           </li>
         </ul>
       </nav>
@@ -137,7 +160,16 @@ function SidebarContent({ pathname, t, onNavigate }: SidebarContentProps) {
 export default function BusinessSidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const t = useTranslations("businessSidebar");
+  const logoutT = useTranslations("authMenu");
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("authToken");
+    sessionStorage.removeItem("authRole");
+    setSidebarOpen(false);
+    router.push("/en");
+  };
 
   return (
     <>
@@ -173,6 +205,8 @@ export default function BusinessSidebar() {
               <SidebarContent
                 pathname={pathname}
                 t={t}
+                logoutT={logoutT}
+                onLogout={handleLogout}
                 onNavigate={() => setSidebarOpen(false)}
               />
             </div>
@@ -199,9 +233,19 @@ export default function BusinessSidebar() {
 
       <aside className="hidden lg:fixed lg:inset-y-0 lg:z-40 lg:flex lg:w-72 lg:flex-col">
         <div className="relative flex grow flex-col gap-y-5 overflow-y-auto border-r border-white/10 bg-black px-6 pb-6 before:pointer-events-none before:absolute before:inset-0 before:bg-black/20">
-          <SidebarContent pathname={pathname} t={t} />
+          <SidebarContent
+            pathname={pathname}
+            t={t}
+            logoutT={logoutT}
+            onLogout={handleLogout}
+          />
         </div>
       </aside>
     </>
   );
 }
+
+
+
+
+

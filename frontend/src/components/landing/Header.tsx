@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import LocaleSwitcher from "@/components/ui/LocaleSwitcher";
 import AuthMenu from "@/components/ui/AuthMenu";
 import Link from "next/link";
@@ -12,28 +12,38 @@ import AccentButton from "@/components/ui/AccentButton";
 
 type UserRole = "CAR_OWNER" | "SHOP_OWNER";
 
-type AuthState = {
-  token: string | null;
-  role: UserRole | null;
-};
-
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const [authState, setAuthState] = useState<AuthState>(() => {
-    if (typeof window === "undefined") {
-      return { token: null, role: null };
-    }
-
-    return {
-      token: sessionStorage.getItem("authToken"),
-      role: sessionStorage.getItem("authRole") as UserRole | null,
-    };
-  });
+  const [authVersion, setAuthVersion] = useState(0);
 
   const t = useTranslations("header");
   const authMenuT = useTranslations("authMenu");
   const router = useRouter();
+  const pathname = usePathname();
+
+  const authState = useMemo(() => {
+    if (typeof window === "undefined") {
+      return {
+        token: null as string | null,
+        role: null as UserRole | null,
+      };
+    }
+
+    const token = sessionStorage.getItem("authToken");
+    const storedRole = sessionStorage.getItem("authRole");
+
+    const normalizedRole: UserRole | null =
+      storedRole === "CAR_OWNER" || storedRole === "car_owner"
+        ? "CAR_OWNER"
+        : storedRole === "SHOP_OWNER" || storedRole === "shop_owner"
+          ? "SHOP_OWNER"
+          : null;
+
+    return {
+      token,
+      role: normalizedRole,
+    };
+  }, [pathname, authVersion]);
 
   const authToken = authState.token;
   const authRole = authState.role;
@@ -41,13 +51,8 @@ export default function Header() {
   const handleLogout = () => {
     sessionStorage.removeItem("authToken");
     sessionStorage.removeItem("authRole");
-
-    setAuthState({
-      token: null,
-      role: null,
-    });
-
     setMobileMenuOpen(false);
+    setAuthVersion((v) => v + 1);
     router.push("/en");
   };
 
