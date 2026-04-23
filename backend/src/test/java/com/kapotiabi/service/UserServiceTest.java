@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import com.kapotiabi.dto.request.UpdateUserRequest;
 import com.kapotiabi.dto.response.UserResponse;
 import com.kapotiabi.entity.UserEntity;
+import com.kapotiabi.enums.PartsQuality;
 import com.kapotiabi.enums.UserRole;
 import com.kapotiabi.exception.NotFoundException;
 import com.kapotiabi.repository.UserRepository;
@@ -67,11 +68,15 @@ class UserServiceTest {
     when(userRepository.findById(1L)).thenReturn(Optional.of(user));
     when(userRepository.save(any(UserEntity.class))).thenAnswer(inv -> inv.getArgument(0));
 
-    UpdateUserRequest req = new UpdateUserRequest("Jane", "Smith", "555-9999");
+    UpdateUserRequest req =
+        new UpdateUserRequest("Jane", "Smith", "555-9999", "Tallinn", 10, PartsQuality.OEM);
     UserResponse response = userService.update(1L, req);
 
     assertThat(response.firstName()).isEqualTo("Jane");
     assertThat(response.lastName()).isEqualTo("Smith");
     assertThat(response.phone()).isEqualTo("555-9999");
+    assertThat(response.preferredCity()).isEqualTo("Tallinn");
+    assertThat(response.searchRadiusKm()).isEqualTo(10);
+    assertThat(response.partsQualityPreference()).isEqualTo(PartsQuality.OEM);
   }
 }
