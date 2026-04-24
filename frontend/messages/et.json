@@ -542,7 +542,8 @@
       "distance": "Kaugus",
       "rating": "Google'i hinnang",
       "reviews": "arvustust",
-      "priceStatus": "Hinna staatus"
+      "priceStatus": "Hinna staatus",
+      "updated": "Viimati uuendatud"
     },
     "actions": {
       "view": "Vaata detaile",
@@ -564,7 +565,7 @@
       "actions": "Toimingud"
     },
     "actions": {
-      "view": "Vaata detaile",
+      "book": "Broneeri aeg",
       "remove": "Eemalda"
     }
   },

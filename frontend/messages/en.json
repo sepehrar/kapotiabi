@@ -541,7 +541,8 @@
       "distance": "Distance",
       "rating": "Google rating",
       "reviews": "reviews",
-      "priceStatus": "Price status"
+      "priceStatus": "Price status",
+      "updated": "Updated"
     },
     "actions": {
       "view": "View details",
@@ -563,7 +564,7 @@
       "actions": "Actions"
     },
     "actions": {
-      "view": "View details",
+      "book": "Book a time",
       "remove": "Remove"
     }
   },
