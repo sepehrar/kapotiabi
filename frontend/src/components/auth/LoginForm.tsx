@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import SectionTitle from "../ui/SectionTitle";
 import { validateLoginForm, type LoginFormData } from "@/lib/validations/auth";
 
@@ -17,9 +17,25 @@ type LoginApiResponse = {
   shopStatus: string | null;
 };
 
+function normalizeRole(role: string | null): "CAR_OWNER" | "SHOP_OWNER" | null {
+  if (role === "CAR_OWNER" || role === "car_owner") {
+    return "CAR_OWNER";
+  }
+
+  if (role === "SHOP_OWNER" || role === "shop_owner") {
+    return "SHOP_OWNER";
+  }
+
+  return null;
+}
+
 export default function LoginForm() {
   const t = useTranslations("login");
   const router = useRouter();
+  const pathname = usePathname();
+
+  const localeFromPath = pathname.split("/")[1];
+  const currentLocale = localeFromPath === "et" ? "et" : "en";
 
   const [form, setForm] = useState<LoginFormData>({
     email: "",
@@ -83,11 +99,24 @@ export default function LoginForm() {
       }
 
       if (data && "token" in data && data.token) {
+        const normalizedRole = normalizeRole(data.role);
+
         sessionStorage.setItem("authToken", data.token);
         sessionStorage.setItem("authRole", data.role);
+        window.dispatchEvent(new Event("auth-changed"));
+
+        if (normalizedRole === "CAR_OWNER") {
+          router.push(`/${currentLocale}/account`);
+          return;
+        }
+
+        if (normalizedRole === "SHOP_OWNER") {
+          router.push(`/${currentLocale}/business`);
+          return;
+        }
       }
 
-      router.push("/");
+      router.push(`/${currentLocale}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : t("errors.generic"));
     } finally {
@@ -183,7 +212,7 @@ export default function LoginForm() {
             <p className="mt-6 text-sm text-gray-400">
               {t("links.registerPrompt")}{" "}
               <Link
-                href="/register"
+                href={`/${currentLocale}/register`}
                 className="font-semibold text-white hover:text-(--accent)"
               >
                 {t("links.register")}

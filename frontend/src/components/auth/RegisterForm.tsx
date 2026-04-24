@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useTranslations } from "next-intl";
+import { usePathname, useRouter } from "next/navigation";
 import SectionTitle from "../ui/SectionTitle";
 import {
   validateRegisterForm,
@@ -21,8 +22,25 @@ type RegisterApiResponse = {
 
 type UserRole = "CAR_OWNER" | "SHOP_OWNER";
 
+function normalizeRole(role: string | null): UserRole | null {
+  if (role === "CAR_OWNER" || role === "car_owner") {
+    return "CAR_OWNER";
+  }
+
+  if (role === "SHOP_OWNER" || role === "shop_owner") {
+    return "SHOP_OWNER";
+  }
+
+  return null;
+}
+
 export default function RegisterForm() {
   const t = useTranslations("register");
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const localeFromPath = pathname.split("/")[1];
+  const currentLocale = localeFromPath === "et" ? "et" : "en";
 
   const [form, setForm] = useState<RegisterFormData>({
     firstName: "",
@@ -105,8 +123,21 @@ export default function RegisterForm() {
       }
 
       if (data && "token" in data && data.token) {
+        const normalizedRole = normalizeRole(data.role);
+
         sessionStorage.setItem("authToken", data.token);
         sessionStorage.setItem("authRole", data.role);
+        window.dispatchEvent(new Event("auth-changed"));
+
+        if (normalizedRole === "CAR_OWNER") {
+          router.push(`/${currentLocale}/account`);
+          return;
+        }
+
+        if (normalizedRole === "SHOP_OWNER") {
+          router.push(`/${currentLocale}/business`);
+          return;
+        }
       }
 
       setSuccess(t("messages.success"));
@@ -121,6 +152,8 @@ export default function RegisterForm() {
       });
       setShowPassword(false);
       setShowConfirmPassword(false);
+
+      router.push(`/${currentLocale}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : t("errors.generic"));
     } finally {
@@ -366,7 +399,7 @@ export default function RegisterForm() {
             <p className="mt-6 text-sm text-gray-400">
               {t("links.loginPrompt")}{" "}
               <Link
-                href="/login"
+                href={`/${currentLocale}/login`}
                 className="font-semibold text-white hover:text-(--accent)"
               >
                 {t("links.login")}

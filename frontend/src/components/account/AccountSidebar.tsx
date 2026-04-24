@@ -37,15 +37,18 @@ function classNames(...classes: string[]) {
 }
 
 function isActivePath(pathname: string, href: string) {
+  const normalizedPath = pathname.replace(/^\/[a-z]{2}(?=\/|$)/, "");
+
   if (href === "/account") {
-    return pathname.endsWith("/account");
+    return normalizedPath === "/account";
   }
 
-  return pathname.includes(href);
+  return normalizedPath === href || normalizedPath.startsWith(`${href}/`);
 }
 
 type SidebarContentProps = {
   pathname: string;
+  currentLocale: "en" | "et";
   t: ReturnType<typeof useTranslations<"accountSidebar">>;
   logoutT: ReturnType<typeof useTranslations<"authMenu">>;
   onLogout: () => void;
@@ -54,6 +57,7 @@ type SidebarContentProps = {
 
 function SidebarContent({
   pathname,
+  currentLocale,
   t,
   logoutT,
   onLogout,
@@ -61,13 +65,16 @@ function SidebarContent({
 }: SidebarContentProps) {
   return (
     <>
-      <div className="relative flex h-16 shrink-0 items-center justify-between ">
+      <div className="relative flex h-16 shrink-0 items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link href="/" className="-m-1.5 flex items-center gap-2 p-1.5">
+          <Link
+            href={`/${currentLocale}`}
+            className="-m-1.5 flex items-center gap-2 p-1.5"
+          >
             <span className="sr-only">{t("brand")}</span>
             <span className="text-xl font-bold text-white">KapotiAbi</span>
           </Link>
-          <div className="bg-(--accent) h-2 w-2 rounded-full"></div>
+          <div className="h-2 w-2 rounded-full bg-(--accent)"></div>
           <div>
             <p className="text-base font-light text-white">{t("title")}</p>
           </div>
@@ -88,7 +95,7 @@ function SidebarContent({
                 return (
                   <li key={item.key}>
                     <Link
-                      href={item.href}
+                      href={`/${currentLocale}${item.href}`}
                       onClick={onNavigate}
                       aria-current={active ? "page" : undefined}
                       className={classNames(
@@ -112,6 +119,20 @@ function SidebarContent({
                   </li>
                 );
               })}
+
+              <li>
+                <button
+                  type="button"
+                  onClick={onLogout}
+                  className="group flex w-full items-center gap-x-3 rounded-2xl px-3 py-3 text-sm text-white/70 transition hover:bg-(--pills-background) hover:text-white"
+                >
+                  <ArrowRightOnRectangleIcon
+                    aria-hidden="true"
+                    className="size-4 shrink-0 text-white/40 transition group-hover:text-white"
+                  />
+                  {logoutT("logout")}
+                </button>
+              </li>
             </ul>
           </li>
 
@@ -125,26 +146,12 @@ function SidebarContent({
               </p>
 
               <Link
-                href="/search"
+                href={`/${currentLocale}/search`}
                 className="shrink-0 rounded-full bg-(--pills-background) px-5 py-3 text-sm shadow ring-1 ring-inset ring-white/10 transition-colors duration-300 hover:bg-(--accent)/40 hover:ring-(--accent)"
               >
                 {t("card.button")}
               </Link>
             </div>
-          </li>
-
-          <li>
-            <button
-              type="button"
-              onClick={onLogout}
-              className="group -mx-2 flex w-full items-center gap-x-3 rounded-2xl px-3 py-3 text-sm text-white/70 transition hover:bg-(--pills-background) hover:text-white"
-            >
-              <ArrowRightOnRectangleIcon
-                aria-hidden="true"
-                className="size-4 shrink-0 text-white/40 transition group-hover:text-white"
-              />
-              {logoutT("logout")}
-            </button>
           </li>
         </ul>
       </nav>
@@ -159,11 +166,15 @@ export default function AccountSidebar() {
   const t = useTranslations("accountSidebar");
   const logoutT = useTranslations("authMenu");
 
+  const localeFromPath = pathname.split("/")[1];
+  const currentLocale: "en" | "et" = localeFromPath === "et" ? "et" : "en";
+
   const handleLogout = () => {
     sessionStorage.removeItem("authToken");
     sessionStorage.removeItem("authRole");
+    window.dispatchEvent(new Event("auth-changed"));
     setSidebarOpen(false);
-    router.push("/en");
+    router.push(`/${currentLocale}`);
   };
 
   return (
@@ -171,7 +182,7 @@ export default function AccountSidebar() {
       <Dialog
         open={sidebarOpen}
         onClose={setSidebarOpen}
-        className="relative z-50 lg:hidden "
+        className="relative z-50 lg:hidden"
       >
         <DialogBackdrop
           transition
@@ -199,6 +210,7 @@ export default function AccountSidebar() {
             <div className="relative flex grow flex-col gap-y-2 overflow-y-auto border-r border-white/10 px-6 pb-6 before:pointer-events-none before:absolute before:inset-0 before:bg-black/20">
               <SidebarContent
                 pathname={pathname}
+                currentLocale={currentLocale}
                 t={t}
                 logoutT={logoutT}
                 onLogout={handleLogout}
@@ -230,6 +242,7 @@ export default function AccountSidebar() {
         <div className="relative flex grow flex-col gap-y-5 overflow-y-auto border-r border-white/10 bg-black px-6 pb-6 before:pointer-events-none before:absolute before:inset-0 before:bg-black/20">
           <SidebarContent
             pathname={pathname}
+            currentLocale={currentLocale}
             t={t}
             logoutT={logoutT}
             onLogout={handleLogout}

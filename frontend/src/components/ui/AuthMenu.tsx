@@ -4,6 +4,7 @@ import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
 
 type AuthMenuProps = {
   role: "CAR_OWNER" | "SHOP_OWNER";
@@ -12,7 +13,11 @@ type AuthMenuProps = {
 
 export default function AuthMenu({ role, onLogout }: AuthMenuProps) {
   const t = useTranslations("authMenu");
+  const pathname = usePathname();
   const isCarOwner = role === "CAR_OWNER";
+
+  const localeFromPath = pathname.split("/")[1];
+  const currentLocale = localeFromPath === "et" ? "et" : "en";
 
   return (
     <Popover className="relative">
@@ -28,7 +33,11 @@ export default function AuthMenu({ role, onLogout }: AuthMenuProps) {
       >
         <div className="space-y-1">
           <Link
-            href={isCarOwner ? "/en/account" : "/en/business"}
+            href={
+              isCarOwner
+                ? `/${currentLocale}/account`
+                : `/${currentLocale}/business`
+            }
             className="block rounded-full px-3 py-2 text-sm font-medium text-(--accent-foreground) transition-all duration-300 ease-out hover:bg-(--accent) hover:text-(--accent-foreground)"
           >
             {isCarOwner ? t("account") : t("businessDashboard")}

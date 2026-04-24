@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useTranslations } from "next-intl";
@@ -12,58 +12,82 @@ import AccentButton from "@/components/ui/AccentButton";
 
 type UserRole = "CAR_OWNER" | "SHOP_OWNER";
 
+type AuthState = {
+  token: string | null;
+  role: UserRole | null;
+};
+
+function normalizeRole(role: string | null): UserRole | null {
+  if (role === "CAR_OWNER" || role === "car_owner") {
+    return "CAR_OWNER";
+  }
+
+  if (role === "SHOP_OWNER" || role === "shop_owner") {
+    return "SHOP_OWNER";
+  }
+
+  return null;
+}
+
+function readAuthState(): AuthState {
+  if (typeof window === "undefined") {
+    return {
+      token: null,
+      role: null,
+    };
+  }
+
+  return {
+    token: sessionStorage.getItem("authToken"),
+    role: normalizeRole(sessionStorage.getItem("authRole")),
+  };
+}
+
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [authVersion, setAuthVersion] = useState(0);
+  const [authState, setAuthState] = useState<AuthState>(() => readAuthState());
 
   const t = useTranslations("header");
-  const authMenuT = useTranslations("authMenu");
   const router = useRouter();
   const pathname = usePathname();
 
-  const authState = useMemo(() => {
-    if (typeof window === "undefined") {
-      return {
-        token: null as string | null,
-        role: null as UserRole | null,
-      };
-    }
+  const localeFromPath = pathname.split("/")[1];
+  const currentLocale = localeFromPath === "et" ? "et" : "en";
 
-    const token = sessionStorage.getItem("authToken");
-    const storedRole = sessionStorage.getItem("authRole");
-
-    const normalizedRole: UserRole | null =
-      storedRole === "CAR_OWNER" || storedRole === "car_owner"
-        ? "CAR_OWNER"
-        : storedRole === "SHOP_OWNER" || storedRole === "shop_owner"
-          ? "SHOP_OWNER"
-          : null;
-
-    return {
-      token,
-      role: normalizedRole,
+  useEffect(() => {
+    const syncAuthState = () => {
+      setAuthState(readAuthState());
     };
-  }, [pathname, authVersion]);
+
+    syncAuthState();
+
+    window.addEventListener("auth-changed", syncAuthState);
+    window.addEventListener("storage", syncAuthState);
+
+    return () => {
+      window.removeEventListener("auth-changed", syncAuthState);
+      window.removeEventListener("storage", syncAuthState);
+    };
+  }, [pathname]);
 
   const authToken = authState.token;
   const authRole = authState.role;
+  const isAuthenticated = Boolean(authToken && authRole);
 
   const handleLogout = () => {
     sessionStorage.removeItem("authToken");
     sessionStorage.removeItem("authRole");
+    window.dispatchEvent(new Event("auth-changed"));
     setMobileMenuOpen(false);
-    setAuthVersion((v) => v + 1);
-    router.push("/en");
+    router.push(`/${currentLocale}`);
   };
 
   const navigation = [
     { name: t("nav.findService"), href: "#" },
-    { name: t("nav.categories"), href: "/categories" },
+    { name: t("nav.categories"), href: `/${currentLocale}/categories` },
     { name: t("nav.howItWorks"), href: "#" },
     { name: t("nav.forBusinesses"), href: "#" },
   ];
-
-  const isAuthenticated = Boolean(authToken && authRole);
 
   return (
     <div className="bg-black">
@@ -73,7 +97,10 @@ export default function Header() {
           className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8"
         >
           <div className="flex lg:flex-1">
-            <Link href="/" className="-m-1.5 flex items-center gap-2 p-1.5">
+            <Link
+              href={`/${currentLocale}`}
+              className="-m-1.5 flex items-center gap-2 p-1.5"
+            >
               <span className="sr-only">{t("brand")}</span>
               <span className="text-xl font-bold text-white">{t("brand")}</span>
             </Link>
@@ -107,14 +134,16 @@ export default function Header() {
               <AuthMenu role={authRole} onLogout={handleLogout} />
             ) : (
               <Link
-                href="/login"
+                href={`/${currentLocale}/login`}
                 className="text-sm text-white hover:text-(--accent)"
               >
                 {t("login")}
               </Link>
             )}
 
-            <AccentButton href="/search">{t("startSearch")}</AccentButton>
+            <AccentButton href={`/${currentLocale}/search`}>
+              {t("startSearch")}
+            </AccentButton>
             <LocaleSwitcher />
           </div>
         </nav>
@@ -127,7 +156,10 @@ export default function Header() {
           <div className="fixed inset-0 z-50 bg-black" />
           <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-black p-6 sm:max-w-sm">
             <div className="flex items-center justify-between">
-              <Link href="/" className="-m-1.5 flex items-center gap-2 p-1.5">
+              <Link
+                href={`/${currentLocale}`}
+                className="-m-1.5 flex items-center gap-2 p-1.5"
+              >
                 <span className="sr-only">{t("brand")}</span>
                 <span className="text-2xl font-bold text-white">
                   {t("brand")}
@@ -166,15 +198,13 @@ export default function Header() {
                       <Link
                         href={
                           authRole === "CAR_OWNER"
-                            ? "/en/account"
-                            : "/en/business"
+                            ? `/${currentLocale}/account`
+                            : `/${currentLocale}/business`
                         }
                         className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold text-white hover:text-(--accent)"
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        {authRole === "CAR_OWNER"
-                          ? authMenuT("account")
-                          : authMenuT("business")}
+                        {authRole === "CAR_OWNER" ? "My account" : "Business"}
                       </Link>
 
                       <button
@@ -182,12 +212,12 @@ export default function Header() {
                         onClick={handleLogout}
                         className="-mx-3 block w-full rounded-lg px-3 py-2.5 text-left text-base font-semibold text-white hover:text-(--accent)"
                       >
-                        {authMenuT("logout")}
+                        Log out
                       </button>
                     </>
                   ) : (
                     <Link
-                      href="/login"
+                      href={`/${currentLocale}/login`}
                       className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold text-white hover:text-(--accent)"
                       onClick={() => setMobileMenuOpen(false)}
                     >
@@ -195,7 +225,9 @@ export default function Header() {
                     </Link>
                   )}
 
-                  <AccentButton href="/search">{t("startSearch")}</AccentButton>
+                  <AccentButton href={`/${currentLocale}/search`}>
+                    {t("startSearch")}
+                  </AccentButton>
                 </div>
               </div>
             </div>
