@@ -79,6 +79,15 @@ class ReviewServiceTest {
   }
 
   @Test
+  void submit_wrongUser_throwsForbidden() {
+    when(bookingRepository.findById(1L)).thenReturn(Optional.of(buildBooking("completed")));
+
+    ReviewRequest req = new ReviewRequest(5, "Great!");
+    assertThatThrownBy(() -> reviewService.submit(1L, req, 999L))
+        .isInstanceOf(com.kapotiabi.exception.ForbiddenException.class);
+  }
+
+  @Test
   void submit_alreadyExists() {
     when(bookingRepository.findById(1L)).thenReturn(Optional.of(buildBooking("completed")));
     when(reviewRepository.findByBookingId(1L)).thenReturn(Optional.of(buildReview()));

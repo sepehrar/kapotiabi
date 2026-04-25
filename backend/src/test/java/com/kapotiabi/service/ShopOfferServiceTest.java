@@ -144,6 +144,35 @@ class ShopOfferServiceTest {
   }
 
   @Test
+  void update_success() {
+    ShopOfferEntity offer = buildOffer("pending");
+    when(shopOfferRepository.findById(1L)).thenReturn(Optional.of(offer));
+    when(repairShopRepository.findByOwnerId(SHOP_OWNER_ID)).thenReturn(Optional.of(buildShop()));
+    when(shopOfferRepository.save(any(ShopOfferEntity.class)))
+        .thenAnswer(inv -> inv.getArgument(0));
+
+    ShopOfferRequest req =
+        new ShopOfferRequest(SHOP_ID, new BigDecimal("200.00"), "new breakdown", "OEM", null, null);
+    ShopOfferResponse response = shopOfferService.update(1L, req, SHOP_OWNER_ID);
+
+    assertThat(response.priceEstimate()).isEqualByComparingTo(new BigDecimal("200.00"));
+  }
+
+  @Test
+  void update_wrongShop_throwsForbidden() {
+    ShopOfferEntity offer = buildOffer("pending");
+    when(shopOfferRepository.findById(1L)).thenReturn(Optional.of(offer));
+    RepairShopEntity wrongShop =
+        RepairShopEntity.builder().id(99L).ownerId(SHOP_OWNER_ID).name("Other Shop").build();
+    when(repairShopRepository.findByOwnerId(SHOP_OWNER_ID)).thenReturn(Optional.of(wrongShop));
+
+    ShopOfferRequest req =
+        new ShopOfferRequest(SHOP_ID, new BigDecimal("200.00"), null, null, null, null);
+    assertThatThrownBy(() -> shopOfferService.update(1L, req, SHOP_OWNER_ID))
+        .isInstanceOf(ForbiddenException.class);
+  }
+
+  @Test
   void reject_success() {
     ShopOfferEntity offer = buildOffer("pending");
     when(shopOfferRepository.findById(1L)).thenReturn(Optional.of(offer));
