@@ -33,8 +33,7 @@ public class BookingController {
 
   @GetMapping
   @Operation(
-      summary =
-          "Get bookings for the authenticated user (car owner) or their shop (shop owner)")
+      summary = "Get bookings for the authenticated user (car owner) or their shop (shop owner)")
   public ResponseEntity<List<BookingResponse>> getBookings() {
     Long authUserId = SecurityUtils.getAuthUserId();
     if (SecurityUtils.hasRole("SHOP_OWNER")) {
@@ -59,8 +58,7 @@ public class BookingController {
   @Operation(summary = "Schedule a booking")
   public ResponseEntity<BookingResponse> schedule(
       @PathVariable Long id,
-      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-          LocalDateTime scheduledAt) {
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime scheduledAt) {
     return ResponseEntity.ok(
         bookingService.schedule(id, scheduledAt, SecurityUtils.getAuthUserId()));
   }

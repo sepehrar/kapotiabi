@@ -144,8 +144,7 @@ class BookingServiceTest {
   @Test
   void confirm_wrongShop_throwsForbidden() {
     when(bookingRepository.findById(1L)).thenReturn(Optional.of(buildBooking("awaiting_shop")));
-    RepairShopEntity wrongShop =
-        RepairShopEntity.builder().id(99L).ownerId(SHOP_OWNER_ID).build();
+    RepairShopEntity wrongShop = RepairShopEntity.builder().id(99L).ownerId(SHOP_OWNER_ID).build();
     when(repairShopRepository.findByOwnerId(SHOP_OWNER_ID)).thenReturn(Optional.of(wrongShop));
 
     assertThatThrownBy(() -> bookingService.confirm(1L, SHOP_OWNER_ID))
@@ -169,8 +168,7 @@ class BookingServiceTest {
   void schedule_wrongStatus_throwsIllegalState() {
     when(bookingRepository.findById(1L)).thenReturn(Optional.of(buildBooking("awaiting_shop")));
 
-    assertThatThrownBy(
-            () -> bookingService.schedule(1L, LocalDateTime.now(), SHOP_OWNER_ID))
+    assertThatThrownBy(() -> bookingService.schedule(1L, LocalDateTime.now(), SHOP_OWNER_ID))
         .isInstanceOf(IllegalStateException.class)
         .hasMessageContaining("cannot be scheduled");
   }
