@@ -3,9 +3,12 @@ package com.kapotiabi.service;
 import com.kapotiabi.dto.request.ShopOfferRequest;
 import com.kapotiabi.dto.response.ShopOfferResponse;
 import com.kapotiabi.entity.JobRequestEntity;
+import com.kapotiabi.entity.RepairShopEntity;
 import com.kapotiabi.entity.ShopOfferEntity;
+import com.kapotiabi.exception.ForbiddenException;
 import com.kapotiabi.exception.NotFoundException;
 import com.kapotiabi.repository.JobRequestRepository;
+import com.kapotiabi.repository.RepairShopRepository;
 import com.kapotiabi.repository.ShopOfferRepository;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,6 +30,7 @@ public class ShopOfferService {
 
   private final ShopOfferRepository shopOfferRepository;
   private final JobRequestRepository jobRequestRepository;
+  private final RepairShopRepository repairShopRepository;
 
   @Value("${app.upload-dir}")
   private String uploadDir;
@@ -42,16 +46,21 @@ public class ShopOfferService {
   }
 
   @Transactional
-  public ShopOfferResponse create(Long jobRequestId, ShopOfferRequest req) {
+  public ShopOfferResponse create(Long jobRequestId, ShopOfferRequest req, Long authUserId) {
     JobRequestEntity jobRequest =
         jobRequestRepository
             .findById(jobRequestId)
             .orElseThrow(() -> new NotFoundException("Job request not found: " + jobRequestId));
 
+    RepairShopEntity shop =
+        repairShopRepository
+            .findByOwnerId(authUserId)
+            .orElseThrow(() -> new ForbiddenException("No shop found for this user"));
+
     ShopOfferEntity offer =
         ShopOfferEntity.builder()
             .jobRequestId(jobRequestId)
-            .shopId(req.shopId())
+            .shopId(shop.getId())
             .priceEstimate(req.priceEstimate())
             .breakdown(req.breakdown())
             .partsTier(req.partsTier())

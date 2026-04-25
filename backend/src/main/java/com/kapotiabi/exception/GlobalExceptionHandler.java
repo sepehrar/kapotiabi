@@ -60,6 +60,12 @@ public class GlobalExceptionHandler {
     return error(HttpStatus.BAD_REQUEST, message, req.getRequestURI());
   }
 
+  @ExceptionHandler(ForbiddenException.class)
+  public ResponseEntity<Map<String, Object>> handleForbidden(
+      ForbiddenException ex, HttpServletRequest req) {
+    return error(HttpStatus.FORBIDDEN, ex.getMessage(), req.getRequestURI());
+  }
+
   @ExceptionHandler(NotFoundException.class)
   public ResponseEntity<Map<String, Object>> handleNotFound(
       NotFoundException ex, HttpServletRequest req) {

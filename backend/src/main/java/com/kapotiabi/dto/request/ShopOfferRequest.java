@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record ShopOfferRequest(
-    @NotNull Long shopId,
+    Long shopId,
     @NotNull BigDecimal priceEstimate,
     String breakdown,
     String partsTier,
