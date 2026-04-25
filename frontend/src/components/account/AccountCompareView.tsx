@@ -37,25 +37,28 @@ const comparedServices = [
   },
 ];
 
-const rows = [
-  { key: "price", label: "rows.price", getValue: (s) => s.price },
-  { key: "distance", label: "rows.distance", getValue: (s) => s.distance },
-  {
-    key: "rating",
-    label: "rows.rating",
-    getValue: (s) => `${s.rating} (${s.reviews})`,
-  },
-  {
-    key: "partsQuality",
-    label: "rows.partsQuality",
-    getValue: (s) => s.partsQuality,
-  },
-  {
-    key: "priceStatus",
-    label: "rows.priceStatus",
-    getValue: (s) => s.updatedAt,
-  },
-];
+type Service = (typeof comparedServices)[0];
+
+const rows: { key: string; label: string; getValue: (s: Service) => string }[] =
+  [
+    { key: "price", label: "rows.price", getValue: (s) => s.price },
+    { key: "distance", label: "rows.distance", getValue: (s) => s.distance },
+    {
+      key: "rating",
+      label: "rows.rating",
+      getValue: (s) => `${s.rating} (${s.reviews})`,
+    },
+    {
+      key: "partsQuality",
+      label: "rows.partsQuality",
+      getValue: (s) => s.partsQuality,
+    },
+    {
+      key: "priceStatus",
+      label: "rows.priceStatus",
+      getValue: (s) => s.updatedAt,
+    },
+  ];
 
 export default function AccountCompareView() {
   const t = useTranslations("accountCompare");
