@@ -76,8 +76,10 @@ function SidebarContent({
             <span className="sr-only">{t("brand")}</span>
             <span className="text-xl font-bold text-white">KapotiAbi</span>
           </Link>
-          <div className="h-2 w-2 rounded-full bg-(--accent)" />
-          <p className="text-base font-light text-white">{t("title")}</p>
+          <div className="h-2 w-2 rounded-full bg-(--accent)"></div>
+          <div>
+            <p className="text-base font-light text-white">{t("title")}</p>
+          </div>
         </div>
       </div>
 
@@ -136,7 +138,7 @@ function SidebarContent({
           </li>
 
           <li className="mt-auto mb-4">
-            <div className="items-start text-left justify-start">
+            <div className="text-center">
               <p className="mb-4 text-base font-semibold text-white">
                 {t("card.title")}
               </p>
@@ -145,7 +147,7 @@ function SidebarContent({
               </p>
               <Link
                 href={`/${currentLocale}/search`}
-                className="shrink-0 rounded-full bg-(--pills-background) px-5 py-3 text-sm shadow ring-1 ring-inset ring-white/10 transition-colors duration-300 hover:bg-(--accent)/40 hover:ring-(--accent) mt-2"
+                className="shrink-0 rounded-full bg-(--pills-background) px-5 py-3 text-sm shadow ring-1 ring-inset ring-white/10 transition-colors duration-300 hover:bg-(--accent)/40 hover:ring-(--accent)"
               >
                 {t("card.button")}
               </Link>

@@ -63,7 +63,8 @@ class RepairShopServiceTest {
 
   @Test
   void getAll_byCity() {
-    when(repairShopRepository.findByCity("Tallinn")).thenReturn(List.of(buildShop()));
+    when(repairShopRepository.findByStatusAndCity("active", "Tallinn"))
+        .thenReturn(List.of(buildShop()));
 
     List<RepairShopResponse> result = repairShopService.getAll("Tallinn", null);
 

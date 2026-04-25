@@ -4,7 +4,39 @@ import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
-type Status = "new" | "accepted" | "booked";
+function AccentCheckbox({
+  checked,
+  onChange,
+}: {
+  checked: boolean;
+  onChange: (value: boolean) => void;
+}) {
+  return (
+    <div className="flex h-7 shrink-0 items-center">
+      <div className="group grid size-6 grid-cols-1">
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={(event) => onChange(event.target.checked)}
+          className="col-start-1 row-start-1 size-6 appearance-none rounded-md border border-white/15 bg-white/5 checked:border-(--accent) checked:bg-(--accent) hover:border-white/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent) forced-colors:appearance-auto"
+        />
+        <svg
+          fill="none"
+          viewBox="0 0 14 14"
+          className="pointer-events-none col-start-1 row-start-1 size-4 self-center justify-self-center stroke-(--accent-foreground)"
+        >
+          <path
+            d="M3 8L6 11L11 3.5"
+            strokeWidth={2.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={checked ? "opacity-100" : "opacity-0"}
+          />
+        </svg>
+      </div>
+    </div>
+  );
+}
 
 const statusStyles: Record<Status, string> = {
   new: "bg-white/10 text-white/40",

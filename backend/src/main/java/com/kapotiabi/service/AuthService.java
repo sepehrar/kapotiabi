@@ -1,6 +1,11 @@
 package com.kapotiabi.service;
 
-import com.kapotiabi.dto.*;
+import com.kapotiabi.dto.AuthResponse;
+import com.kapotiabi.dto.ChangePasswordRequest;
+import com.kapotiabi.dto.ForgotPasswordRequest;
+import com.kapotiabi.dto.LoginRequest;
+import com.kapotiabi.dto.RegisterRequest;
+import com.kapotiabi.dto.ResetPasswordRequest;
 import com.kapotiabi.entity.PasswordResetTokenEntity;
 import com.kapotiabi.entity.RepairShopEntity;
 import com.kapotiabi.entity.UserEntity;
@@ -8,6 +13,7 @@ import com.kapotiabi.enums.UserRole;
 import com.kapotiabi.exception.DuplicateEmailException;
 import com.kapotiabi.exception.InvalidCredentialsException;
 import com.kapotiabi.exception.InvalidTokenException;
+import com.kapotiabi.exception.NotFoundException;
 import com.kapotiabi.repository.PasswordResetTokenRepository;
 import com.kapotiabi.repository.RepairShopRepository;
 import com.kapotiabi.repository.UserRepository;
@@ -134,6 +140,24 @@ public class AuthService {
     passwordResetTokenRepository.save(resetToken);
 
     return Map.of("message", "Password updated successfully.");
+  }
+
+  @Transactional
+  public void changePassword(Long userId, ChangePasswordRequest req) {
+    UserEntity user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(() -> new NotFoundException("User not found: " + userId));
+
+    if (!passwordEncoder.matches(req.currentPassword(), user.getPasswordHash())) {
+      throw new InvalidCredentialsException("Current password is incorrect");
+    }
+    if (req.newPassword().equals(req.currentPassword())) {
+      throw new IllegalArgumentException(
+          "New password must be different from the current password");
+    }
+    user.setPasswordHash(passwordEncoder.encode(req.newPassword()));
+    userRepository.save(user);
   }
 
   private AuthResponse buildAuthResponse(UserEntity user, String shopStatus) {
