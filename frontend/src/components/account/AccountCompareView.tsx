@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { BookmarkIcon } from "@heroicons/react/24/outline";
 
 const comparedServices = [
   {
@@ -88,11 +89,23 @@ export default function AccountCompareView() {
           <div className="p-5 text-sm font-medium text-white/30">
             {t("rows.service")}
           </div>
+
           {comparedServices.map((service) => (
-            <div key={service.id} className="p-5 border-l border-white/10">
+            <div
+              key={service.id}
+              className="p-5 border-l border-white/10 flex items-center justify-between gap-3"
+            >
               <h2 className="text-base font-semibold text-white">
                 {service.name}
               </h2>
+
+              <button
+                type="button"
+                aria-label={t("actions.save")}
+                className="shrink-0 rounded-full bg-(--pills-background) p-2 text-white/60 shadow ring-1 ring-inset ring-white/10 transition-colors duration-300 hover:bg-(--accent)/40 hover:ring-(--accent) hover:text-white"
+              >
+                <BookmarkIcon className="size-4" />
+              </button>
             </div>
           ))}
         </div>
@@ -107,6 +120,7 @@ export default function AccountCompareView() {
             <div className="p-5 text-sm text-white/40 flex items-center">
               {t(row.label)}
             </div>
+
             {comparedServices.map((service) => (
               <div
                 key={`${service.id}-${row.key}`}
@@ -128,6 +142,7 @@ export default function AccountCompareView() {
           <div className="p-5 text-sm text-white/40 flex items-center">
             {t("rows.actions")}
           </div>
+
           {comparedServices.map((service) => (
             <div
               key={`${service.id}-actions`}
@@ -139,6 +154,7 @@ export default function AccountCompareView() {
               >
                 {t("actions.book")}
               </Link>
+
               <button
                 type="button"
                 className="inline-flex items-center justify-center rounded-full bg-(--pills-background) px-4 py-2 text-sm font-semibold text-white/60 shadow ring-1 ring-inset ring-white/10 transition-colors duration-300 hover:bg-(--accent)/40 hover:ring-(--accent) hover:text-white"
@@ -172,10 +188,18 @@ export default function AccountCompareView() {
 
         {/* Card */}
         <div className="rounded-2xl border border-white/10 bg-(--pills-background) overflow-hidden">
-          <div className="p-5 border-b border-white/10">
+          <div className="p-5 border-b border-white/10 flex items-center justify-between gap-3">
             <h2 className="text-xl font-semibold text-white">
               {comparedServices[activeIndex].name}
             </h2>
+
+            <button
+              type="button"
+              aria-label={t("actions.save")}
+              className="shrink-0 rounded-full bg-(--pills-background) p-2 text-white/60 shadow ring-1 ring-inset ring-white/10 transition-colors duration-300 hover:bg-(--accent)/40 hover:ring-(--accent) hover:text-white"
+            >
+              <BookmarkIcon className="size-5" />
+            </button>
           </div>
 
           {rows.map((row) => (
@@ -197,6 +221,7 @@ export default function AccountCompareView() {
             >
               {t("actions.book")}
             </Link>
+
             <button
               type="button"
               className="inline-flex items-center justify-center rounded-full bg-(--pills-background) px-4 py-3 text-sm font-semibold text-white/60 shadow ring-1 ring-inset ring-white/10 transition-colors duration-300 hover:bg-(--accent)/40 hover:ring-(--accent) hover:text-white"
