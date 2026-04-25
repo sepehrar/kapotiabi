@@ -96,12 +96,12 @@ export default function AccountSavedView() {
                   {t("actions.view")}
                 </Link>
 
-                <button
+                {/* <button
                   type="button"
                   className="shrink-0 rounded-full bg-(--pills-background) px-5 py-3 text-sm shadow ring-1 ring-inset ring-white/10 transition-colors duration-300 hover:bg-(--accent)/40 hover:ring-(--accent) hover:text-white text-white/60"
                 >
                   {t("actions.compare")}
-                </button>
+                </button> */}
 
                 <button
                   type="button"
