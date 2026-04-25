@@ -90,7 +90,7 @@ public class JobRequestController {
   }
 
   @PostMapping("/{id}/offers")
-  @Operation(summary = "Submit an offer for a job request")
+  @Operation(summary = "Submit an offer for a job request (shop owner only)")
   public ResponseEntity<ShopOfferResponse> createOffer(
       @PathVariable Long id, @Valid @RequestBody ShopOfferRequest req) {
     ShopOfferResponse created = shopOfferService.create(id, req, SecurityUtils.getAuthUserId());

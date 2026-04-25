@@ -41,6 +41,10 @@ public class ShopOfferService {
         .toList();
   }
 
+  public List<ShopOfferResponse> getByShop(Long shopId) {
+    return shopOfferRepository.findByShopId(shopId).stream().map(ShopOfferResponse::from).toList();
+  }
+
   public ShopOfferResponse getById(Long id) {
     return ShopOfferResponse.from(findOrThrow(id));
   }
@@ -79,8 +83,10 @@ public class ShopOfferService {
     return ShopOfferResponse.from(offer);
   }
 
-  public ShopOfferResponse update(Long id, ShopOfferRequest req) {
+  @Transactional
+  public ShopOfferResponse update(Long id, ShopOfferRequest req, Long authUserId) {
     ShopOfferEntity offer = findOrThrow(id);
+    verifyShopOwner(authUserId, offer.getShopId());
     offer.setPriceEstimate(req.priceEstimate());
     offer.setBreakdown(req.breakdown());
     offer.setPartsTier(req.partsTier());
@@ -89,17 +95,29 @@ public class ShopOfferService {
     return ShopOfferResponse.from(shopOfferRepository.save(offer));
   }
 
-  public ShopOfferResponse reject(Long id) {
+  @Transactional
+  public ShopOfferResponse reject(Long id, Long authUserId) {
     ShopOfferEntity offer = findOrThrow(id);
+    JobRequestEntity jobRequest =
+        jobRequestRepository
+            .findById(offer.getJobRequestId())
+            .orElseThrow(
+                () -> new NotFoundException("Job request not found: " + offer.getJobRequestId()));
+    if (!authUserId.equals(jobRequest.getUserId())) {
+      throw new ForbiddenException("You don't have access to this offer");
+    }
     offer.setStatus("rejected");
     return ShopOfferResponse.from(shopOfferRepository.save(offer));
   }
 
-  public ShopOfferEntity uploadPdf(Long offerId, MultipartFile file) throws IOException {
+  public ShopOfferEntity uploadPdf(Long offerId, MultipartFile file, Long authUserId)
+      throws IOException {
     if (!"application/pdf".equals(file.getContentType())) {
       throw new IllegalArgumentException("Only PDF files are allowed");
     }
     ShopOfferEntity offer = findOrThrow(offerId);
+    verifyShopOwner(authUserId, offer.getShopId());
+
     Path dir = Paths.get(uploadDir, "offers", offerId.toString());
     Files.createDirectories(dir);
 
@@ -124,6 +142,16 @@ public class ShopOfferService {
       throw new NotFoundException("PDF file not found for offer: " + offerId);
     }
     return resource;
+  }
+
+  private void verifyShopOwner(Long authUserId, Long requiredShopId) {
+    RepairShopEntity shop =
+        repairShopRepository
+            .findByOwnerId(authUserId)
+            .orElseThrow(() -> new ForbiddenException("No shop found for this user"));
+    if (!shop.getId().equals(requiredShopId)) {
+      throw new ForbiddenException("You don't have access to this offer");
+    }
   }
 
   private ShopOfferEntity findOrThrow(Long id) {
