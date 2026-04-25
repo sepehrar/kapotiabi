@@ -41,6 +41,10 @@ public class ShopOfferService {
         .toList();
   }
 
+  public List<ShopOfferResponse> getByShop(Long shopId) {
+    return shopOfferRepository.findByShopId(shopId).stream().map(ShopOfferResponse::from).toList();
+  }
+
   public ShopOfferResponse getById(Long id) {
     return ShopOfferResponse.from(findOrThrow(id));
   }

@@ -91,6 +91,16 @@ class ShopOfferServiceTest {
   }
 
   @Test
+  void getByShop() {
+    when(shopOfferRepository.findByShopId(2L)).thenReturn(List.of(buildOffer("pending")));
+
+    List<ShopOfferResponse> result = shopOfferService.getByShop(2L);
+
+    assertThat(result).hasSize(1);
+    assertThat(result.get(0).shopId()).isEqualTo(2L);
+  }
+
+  @Test
   void getById() {
     when(shopOfferRepository.findById(1L)).thenReturn(Optional.of(buildOffer("pending")));
 
