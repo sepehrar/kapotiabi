@@ -70,6 +70,7 @@ public class ShopOfferService {
     return ShopOfferResponse.from(offer);
   }
 
+  @Transactional
   public ShopOfferResponse update(Long id, ShopOfferRequest req) {
     ShopOfferEntity offer = findOrThrow(id);
     offer.setPriceEstimate(req.priceEstimate());
@@ -80,6 +81,7 @@ public class ShopOfferService {
     return ShopOfferResponse.from(shopOfferRepository.save(offer));
   }
 
+  @Transactional
   public ShopOfferResponse reject(Long id) {
     ShopOfferEntity offer = findOrThrow(id);
     offer.setStatus("rejected");

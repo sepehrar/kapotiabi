@@ -71,8 +71,13 @@ public class BookingService {
     return BookingResponse.from(bookingRepository.save(booking));
   }
 
+  @Transactional
   public BookingResponse confirm(Long id) {
     BookingEntity booking = findOrThrow(id);
+    if (!"awaiting_shop".equals(booking.getStatus())) {
+      throw new IllegalStateException(
+          "Booking cannot be confirmed from status: " + booking.getStatus());
+    }
     booking.setConfirmedByShop(true);
     booking.setShopConfirmedAt(LocalDateTime.now());
     booking.setStatus("confirmed");
@@ -80,22 +85,37 @@ public class BookingService {
     return BookingResponse.from(bookingRepository.save(booking));
   }
 
+  @Transactional
   public BookingResponse schedule(Long id, LocalDateTime scheduledAt) {
     BookingEntity booking = findOrThrow(id);
+    if (!"confirmed".equals(booking.getStatus())) {
+      throw new IllegalStateException(
+          "Booking cannot be scheduled from status: " + booking.getStatus());
+    }
     booking.setScheduledAt(scheduledAt);
     booking.setUpdatedAt(LocalDateTime.now());
     return BookingResponse.from(bookingRepository.save(booking));
   }
 
+  @Transactional
   public BookingResponse complete(Long id) {
     BookingEntity booking = findOrThrow(id);
+    if (!"confirmed".equals(booking.getStatus())) {
+      throw new IllegalStateException(
+          "Booking cannot be completed from status: " + booking.getStatus());
+    }
     booking.setStatus("completed");
     booking.setUpdatedAt(LocalDateTime.now());
     return BookingResponse.from(bookingRepository.save(booking));
   }
 
+  @Transactional
   public BookingResponse cancel(Long id) {
     BookingEntity booking = findOrThrow(id);
+    if ("completed".equals(booking.getStatus()) || "cancelled".equals(booking.getStatus())) {
+      throw new IllegalStateException(
+          "Booking cannot be cancelled from status: " + booking.getStatus());
+    }
     booking.setStatus("cancelled");
     booking.setUpdatedAt(LocalDateTime.now());
     return BookingResponse.from(bookingRepository.save(booking));
