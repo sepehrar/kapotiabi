@@ -6,6 +6,7 @@ import com.kapotiabi.dto.response.RepairShopResponse;
 import com.kapotiabi.dto.response.ReviewResponse;
 import com.kapotiabi.dto.response.ShopOfferResponse;
 import com.kapotiabi.dto.response.ShopServiceCategoryResponse;
+import com.kapotiabi.security.SecurityUtils;
 import com.kapotiabi.service.RepairShopService;
 import com.kapotiabi.service.ShopOfferService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,7 +46,7 @@ public class RepairShopController {
   @PostMapping
   @Operation(summary = "Create a new repair shop")
   public ResponseEntity<RepairShopResponse> create(@Valid @RequestBody RepairShopRequest req) {
-    RepairShopResponse created = repairShopService.create(req);
+    RepairShopResponse created = repairShopService.create(req, SecurityUtils.getAuthUserId());
     URI location =
         ServletUriComponentsBuilder.fromCurrentRequest()
             .path("/{id}")
@@ -64,7 +65,7 @@ public class RepairShopController {
   @Operation(summary = "Update repair shop")
   public ResponseEntity<RepairShopResponse> update(
       @PathVariable Long id, @Valid @RequestBody RepairShopRequest req) {
-    return ResponseEntity.ok(repairShopService.update(id, req));
+    return ResponseEntity.ok(repairShopService.update(id, req, SecurityUtils.getAuthUserId()));
   }
 
   @GetMapping("/{id}/categories")

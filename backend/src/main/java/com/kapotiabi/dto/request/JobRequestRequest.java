@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 public record JobRequestRequest(
-    @NotNull Long userId,
     @NotNull Long carId,
     @NotBlank String description,
     Boolean acceptsNonOem,
