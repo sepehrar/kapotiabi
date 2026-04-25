@@ -153,7 +153,8 @@ public class AuthService {
       throw new InvalidCredentialsException("Current password is incorrect");
     }
     if (req.newPassword().equals(req.currentPassword())) {
-      throw new IllegalArgumentException("New password must be different from the current password");
+      throw new IllegalArgumentException(
+          "New password must be different from the current password");
     }
     user.setPasswordHash(passwordEncoder.encode(req.newPassword()));
     userRepository.save(user);

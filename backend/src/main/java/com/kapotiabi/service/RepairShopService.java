@@ -38,9 +38,7 @@ public class RepairShopService {
 
   public List<RepairShopResponse> getAllForAdmin(String status) {
     List<RepairShopEntity> shops =
-        status != null
-            ? repairShopRepository.findByStatus(status)
-            : repairShopRepository.findAll();
+        status != null ? repairShopRepository.findByStatus(status) : repairShopRepository.findAll();
     return shops.stream().map(RepairShopResponse::from).toList();
   }
 
