@@ -3,9 +3,12 @@ package com.kapotiabi.service;
 import com.kapotiabi.dto.request.ShopOfferRequest;
 import com.kapotiabi.dto.response.ShopOfferResponse;
 import com.kapotiabi.entity.JobRequestEntity;
+import com.kapotiabi.entity.RepairShopEntity;
 import com.kapotiabi.entity.ShopOfferEntity;
+import com.kapotiabi.exception.ForbiddenException;
 import com.kapotiabi.exception.NotFoundException;
 import com.kapotiabi.repository.JobRequestRepository;
+import com.kapotiabi.repository.RepairShopRepository;
 import com.kapotiabi.repository.ShopOfferRepository;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,6 +30,7 @@ public class ShopOfferService {
 
   private final ShopOfferRepository shopOfferRepository;
   private final JobRequestRepository jobRequestRepository;
+  private final RepairShopRepository repairShopRepository;
 
   @Value("${app.upload-dir}")
   private String uploadDir;
@@ -42,16 +46,21 @@ public class ShopOfferService {
   }
 
   @Transactional
-  public ShopOfferResponse create(Long jobRequestId, ShopOfferRequest req) {
+  public ShopOfferResponse create(Long jobRequestId, ShopOfferRequest req, Long authUserId) {
     JobRequestEntity jobRequest =
         jobRequestRepository
             .findById(jobRequestId)
             .orElseThrow(() -> new NotFoundException("Job request not found: " + jobRequestId));
 
+    RepairShopEntity shop =
+        repairShopRepository
+            .findByOwnerId(authUserId)
+            .orElseThrow(() -> new ForbiddenException("No shop found for this user"));
+
     ShopOfferEntity offer =
         ShopOfferEntity.builder()
             .jobRequestId(jobRequestId)
-            .shopId(req.shopId())
+            .shopId(shop.getId())
             .priceEstimate(req.priceEstimate())
             .breakdown(req.breakdown())
             .partsTier(req.partsTier())
@@ -71,8 +80,9 @@ public class ShopOfferService {
   }
 
   @Transactional
-  public ShopOfferResponse update(Long id, ShopOfferRequest req) {
+  public ShopOfferResponse update(Long id, ShopOfferRequest req, Long authUserId) {
     ShopOfferEntity offer = findOrThrow(id);
+    verifyShopOwner(authUserId, offer.getShopId());
     offer.setPriceEstimate(req.priceEstimate());
     offer.setBreakdown(req.breakdown());
     offer.setPartsTier(req.partsTier());
@@ -82,17 +92,28 @@ public class ShopOfferService {
   }
 
   @Transactional
-  public ShopOfferResponse reject(Long id) {
+  public ShopOfferResponse reject(Long id, Long authUserId) {
     ShopOfferEntity offer = findOrThrow(id);
+    JobRequestEntity jobRequest =
+        jobRequestRepository
+            .findById(offer.getJobRequestId())
+            .orElseThrow(
+                () -> new NotFoundException("Job request not found: " + offer.getJobRequestId()));
+    if (!authUserId.equals(jobRequest.getUserId())) {
+      throw new ForbiddenException("You don't have access to this offer");
+    }
     offer.setStatus("rejected");
     return ShopOfferResponse.from(shopOfferRepository.save(offer));
   }
 
-  public ShopOfferEntity uploadPdf(Long offerId, MultipartFile file) throws IOException {
+  public ShopOfferEntity uploadPdf(Long offerId, MultipartFile file, Long authUserId)
+      throws IOException {
     if (!"application/pdf".equals(file.getContentType())) {
       throw new IllegalArgumentException("Only PDF files are allowed");
     }
     ShopOfferEntity offer = findOrThrow(offerId);
+    verifyShopOwner(authUserId, offer.getShopId());
+
     Path dir = Paths.get(uploadDir, "offers", offerId.toString());
     Files.createDirectories(dir);
 
@@ -117,6 +138,16 @@ public class ShopOfferService {
       throw new NotFoundException("PDF file not found for offer: " + offerId);
     }
     return resource;
+  }
+
+  private void verifyShopOwner(Long authUserId, Long requiredShopId) {
+    RepairShopEntity shop =
+        repairShopRepository
+            .findByOwnerId(authUserId)
+            .orElseThrow(() -> new ForbiddenException("No shop found for this user"));
+    if (!shop.getId().equals(requiredShopId)) {
+      throw new ForbiddenException("You don't have access to this offer");
+    }
   }
 
   private ShopOfferEntity findOrThrow(Long id) {
