@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ShopOfferService {
 
   private final ShopOfferRepository shopOfferRepository;
@@ -126,6 +127,7 @@ public class ShopOfferService {
     return ShopOfferResponse.from(offer, offerSlotRepository.findByOfferId(id));
   }
 
+  @Transactional
   public ShopOfferEntity uploadPdf(Long offerId, MultipartFile file, Long authUserId)
       throws IOException {
     if (!"application/pdf".equals(file.getContentType())) {

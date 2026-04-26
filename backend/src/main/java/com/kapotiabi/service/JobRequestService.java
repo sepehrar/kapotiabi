@@ -14,9 +14,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class JobRequestService {
 
   private final JobRequestRepository jobRequestRepository;
@@ -47,6 +49,7 @@ public class JobRequestService {
     return JobRequestResponse.from(findOrThrow(id));
   }
 
+  @Transactional
   public JobRequestResponse create(JobRequestRequest req, Long authUserId) {
     LocalDateTime now = LocalDateTime.now();
     JobRequestEntity entity =
@@ -67,6 +70,7 @@ public class JobRequestService {
     return JobRequestResponse.from(jobRequestRepository.save(entity));
   }
 
+  @Transactional
   public JobRequestResponse update(Long id, JobRequestRequest req, Long authUserId) {
     JobRequestEntity entity = findOrThrow(id);
     if (!authUserId.equals(entity.getUser().getId()))
@@ -83,6 +87,7 @@ public class JobRequestService {
     return JobRequestResponse.from(jobRequestRepository.save(entity));
   }
 
+  @Transactional
   public JobRequestResponse cancel(Long id, Long authUserId) {
     JobRequestEntity entity = findOrThrow(id);
     if (!authUserId.equals(entity.getUser().getId()))

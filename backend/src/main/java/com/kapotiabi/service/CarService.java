@@ -11,9 +11,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CarService {
 
   private final CarRepository carRepository;
@@ -27,6 +29,7 @@ public class CarService {
     return CarResponse.from(findOrThrow(id));
   }
 
+  @Transactional
   public CarResponse create(CarRequest req, Long authUserId) {
     CarEntity car =
         CarEntity.builder()
@@ -41,6 +44,7 @@ public class CarService {
     return CarResponse.from(carRepository.save(car));
   }
 
+  @Transactional
   public CarResponse update(Long id, CarRequest req, Long authUserId) {
     CarEntity car = findOrThrow(id);
     if (!authUserId.equals(car.getOwner().getId()))
@@ -53,6 +57,7 @@ public class CarService {
     return CarResponse.from(carRepository.save(car));
   }
 
+  @Transactional
   public void delete(Long id, Long authUserId) {
     CarEntity car = findOrThrow(id);
     if (!authUserId.equals(car.getOwner().getId()))
