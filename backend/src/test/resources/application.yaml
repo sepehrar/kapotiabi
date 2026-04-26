@@ -17,3 +17,5 @@ jwt:
 
 app:
   upload-dir: uploads
+  cors:
+    allowed-origins: http://localhost:3000
