@@ -19,9 +19,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class RepairShopService {
 
   private final RepairShopRepository repairShopRepository;
@@ -49,6 +51,7 @@ public class RepairShopService {
     return shops.stream().map(RepairShopResponse::from).toList();
   }
 
+  @Transactional
   public RepairShopResponse updateShopStatus(Long id, String action) {
     RepairShopEntity shop = findOrThrow(id);
     if (!"draft".equals(shop.getStatus())) {
@@ -63,6 +66,7 @@ public class RepairShopService {
     return RepairShopResponse.from(findOrThrow(id));
   }
 
+  @Transactional
   public RepairShopResponse create(RepairShopRequest req, Long authUserId) {
     RepairShopEntity shop =
         RepairShopEntity.builder()
@@ -80,6 +84,7 @@ public class RepairShopService {
     return RepairShopResponse.from(repairShopRepository.save(shop));
   }
 
+  @Transactional
   public RepairShopResponse update(Long id, RepairShopRequest req, Long authUserId) {
     RepairShopEntity shop = findOrThrow(id);
     if (!authUserId.equals(shop.getOwner().getId()))
@@ -102,6 +107,7 @@ public class RepairShopService {
         .toList();
   }
 
+  @Transactional
   public ShopServiceCategoryResponse addCategory(Long shopId, ShopServiceCategoryRequest req) {
     RepairShopEntity shop = findOrThrow(shopId);
     ShopServiceCategoryEntity category =
@@ -116,6 +122,7 @@ public class RepairShopService {
     return ShopServiceCategoryResponse.from(categoryRepository.save(category));
   }
 
+  @Transactional
   public ShopServiceCategoryResponse updateCategory(
       Long shopId, Long categoryId, ShopServiceCategoryRequest req) {
     findOrThrow(shopId);
@@ -134,6 +141,7 @@ public class RepairShopService {
     return ShopServiceCategoryResponse.from(categoryRepository.save(category));
   }
 
+  @Transactional
   public void deleteCategory(Long shopId, Long categoryId) {
     findOrThrow(shopId);
     ShopServiceCategoryEntity category =

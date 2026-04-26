@@ -7,9 +7,11 @@ import com.kapotiabi.exception.NotFoundException;
 import com.kapotiabi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserService {
 
   private final UserRepository userRepository;
@@ -18,6 +20,7 @@ public class UserService {
     return UserResponse.from(findOrThrow(id));
   }
 
+  @Transactional
   public UserResponse update(Long id, UpdateUserRequest req) {
     UserEntity user = findOrThrow(id);
     user.setFirstName(req.firstName());
