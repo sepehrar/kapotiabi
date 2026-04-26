@@ -13,6 +13,9 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +38,7 @@ public class JobRequestController {
   private final ShopOfferService shopOfferService;
 
   @GetMapping
-  @Operation(summary = "Get job requests by user ID")
+  @Operation(summary = "Get job requests for the authenticated user")
   public ResponseEntity<List<JobRequestResponse>> getByUser() {
     return ResponseEntity.ok(jobRequestService.getByUser(SecurityUtils.getAuthUserId()));
   }
@@ -43,9 +46,11 @@ public class JobRequestController {
   @GetMapping("/available")
   @Operation(
       summary = "Get available (pending) job requests, optionally filtered by city or county")
-  public ResponseEntity<List<JobRequestResponse>> getAvailable(
-      @RequestParam(required = false) String city, @RequestParam(required = false) String county) {
-    return ResponseEntity.ok(jobRequestService.getAvailable(city, county));
+  public ResponseEntity<Page<JobRequestResponse>> getAvailable(
+      @RequestParam(required = false) String city,
+      @RequestParam(required = false) String county,
+      @PageableDefault(size = 20, sort = "id") Pageable pageable) {
+    return ResponseEntity.ok(jobRequestService.getAvailable(city, county, pageable));
   }
 
   @PostMapping
