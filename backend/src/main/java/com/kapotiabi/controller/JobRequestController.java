@@ -36,12 +36,8 @@ public class JobRequestController {
 
   @GetMapping
   @Operation(summary = "Get job requests by user ID")
-  public ResponseEntity<List<JobRequestResponse>> getByUser(
-      @RequestParam(required = false) Long userId) {
-    if (userId == null) {
-      return ResponseEntity.badRequest().build();
-    }
-    return ResponseEntity.ok(jobRequestService.getByUser(userId));
+  public ResponseEntity<List<JobRequestResponse>> getByUser() {
+    return ResponseEntity.ok(jobRequestService.getByUser(SecurityUtils.getAuthUserId()));
   }
 
   @GetMapping("/available")
@@ -55,7 +51,7 @@ public class JobRequestController {
   @PostMapping
   @Operation(summary = "Create a new job request")
   public ResponseEntity<JobRequestResponse> create(@Valid @RequestBody JobRequestRequest req) {
-    JobRequestResponse created = jobRequestService.create(req);
+    JobRequestResponse created = jobRequestService.create(req, SecurityUtils.getAuthUserId());
     URI location =
         ServletUriComponentsBuilder.fromCurrentRequest()
             .path("/{id}")
@@ -74,13 +70,13 @@ public class JobRequestController {
   @Operation(summary = "Update job request")
   public ResponseEntity<JobRequestResponse> update(
       @PathVariable Long id, @Valid @RequestBody JobRequestRequest req) {
-    return ResponseEntity.ok(jobRequestService.update(id, req));
+    return ResponseEntity.ok(jobRequestService.update(id, req, SecurityUtils.getAuthUserId()));
   }
 
   @DeleteMapping("/{id}")
   @Operation(summary = "Cancel job request (soft delete)")
   public ResponseEntity<JobRequestResponse> cancel(@PathVariable Long id) {
-    return ResponseEntity.ok(jobRequestService.cancel(id));
+    return ResponseEntity.ok(jobRequestService.cancel(id, SecurityUtils.getAuthUserId()));
   }
 
   @GetMapping("/{id}/offers")
