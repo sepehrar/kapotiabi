@@ -1,6 +1,7 @@
 package com.kapotiabi.dto.response;
 
 import com.kapotiabi.entity.RepairShopEntity;
+import com.kapotiabi.enums.RepairShopStatus;
 import java.time.LocalDateTime;
 
 public record RepairShopResponse(
@@ -14,7 +15,7 @@ public record RepairShopResponse(
     String email,
     String website,
     String googleMapsUrl,
-    String status,
+    RepairShopStatus status,
     LocalDateTime createdAt) {
   public static RepairShopResponse from(RepairShopEntity e) {
     return new RepairShopResponse(

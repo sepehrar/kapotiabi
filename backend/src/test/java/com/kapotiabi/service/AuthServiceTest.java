@@ -8,6 +8,7 @@ import com.kapotiabi.dto.*;
 import com.kapotiabi.entity.PasswordResetTokenEntity;
 import com.kapotiabi.entity.RepairShopEntity;
 import com.kapotiabi.entity.UserEntity;
+import com.kapotiabi.enums.RepairShopStatus;
 import com.kapotiabi.enums.UserRole;
 import com.kapotiabi.exception.DuplicateEmailException;
 import com.kapotiabi.exception.InvalidCredentialsException;
@@ -106,11 +107,11 @@ class AuthServiceTest {
     AuthResponse response = authService.register(req);
 
     assertThat(response.getRole()).isEqualTo("shop_owner");
-    assertThat(response.getShopStatus()).isEqualTo("draft");
+    assertThat(response.getShopStatus()).isEqualTo(RepairShopStatus.DRAFT);
 
     ArgumentCaptor<RepairShopEntity> shopCaptor = ArgumentCaptor.forClass(RepairShopEntity.class);
     verify(repairShopRepository).save(shopCaptor.capture());
-    assertThat(shopCaptor.getValue().getStatus()).isEqualTo("draft");
+    assertThat(shopCaptor.getValue().getStatus()).isEqualTo(RepairShopStatus.DRAFT);
     assertThat(shopCaptor.getValue().getOwner().getId()).isEqualTo(2L);
   }
 
@@ -232,7 +233,7 @@ class AuthServiceTest {
             .build();
     when(userRepository.findByEmail("shop@test.ee")).thenReturn(Optional.of(user));
     when(repairShopRepository.findByOwnerId(2L))
-        .thenReturn(Optional.of(RepairShopEntity.builder().status("draft").build()));
+        .thenReturn(Optional.of(RepairShopEntity.builder().status(RepairShopStatus.DRAFT).build()));
 
     LoginRequest req = new LoginRequest();
     req.setEmail("shop@test.ee");
@@ -240,7 +241,7 @@ class AuthServiceTest {
 
     AuthResponse response = authService.login(req);
 
-    assertThat(response.getShopStatus()).isEqualTo("draft");
+    assertThat(response.getShopStatus()).isEqualTo(RepairShopStatus.DRAFT);
   }
 
   @Test

@@ -1,5 +1,6 @@
 package com.kapotiabi.entity;
 
+import com.kapotiabi.enums.JobRequestStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -55,7 +56,7 @@ public class JobRequestEntity {
   @Column(name = "ai_summary")
   private String aiSummary;
 
-  private String status;
+  private JobRequestStatus status;
 
   @Column(name = "offer_deadline")
   private LocalDateTime offerDeadline;

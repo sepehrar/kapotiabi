@@ -1,6 +1,7 @@
 package com.kapotiabi.dto.response;
 
 import com.kapotiabi.entity.JobRequestEntity;
+import com.kapotiabi.enums.JobRequestStatus;
 import java.time.LocalDateTime;
 
 public record JobRequestResponse(
@@ -14,7 +15,7 @@ public record JobRequestResponse(
     String city,
     String county,
     String aiSummary,
-    String status,
+    JobRequestStatus status,
     LocalDateTime offerDeadline,
     LocalDateTime createdAt) {
   public static JobRequestResponse from(JobRequestEntity e) {

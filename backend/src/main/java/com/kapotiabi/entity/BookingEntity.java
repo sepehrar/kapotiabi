@@ -1,5 +1,6 @@
 package com.kapotiabi.entity;
 
+import com.kapotiabi.enums.BookingStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -54,7 +55,7 @@ public class BookingEntity {
   @Column(name = "shop_confirmed_at")
   private LocalDateTime shopConfirmedAt;
 
-  private String status;
+  private BookingStatus status;
 
   @Column(name = "created_at", updatable = false)
   private LocalDateTime createdAt;

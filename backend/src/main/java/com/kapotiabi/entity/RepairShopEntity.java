@@ -1,5 +1,6 @@
 package com.kapotiabi.entity;
 
+import com.kapotiabi.enums.RepairShopStatus;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -38,7 +39,7 @@ public class RepairShopEntity {
   @Column(name = "google_maps_url")
   private String googleMapsUrl;
 
-  private String status;
+  private RepairShopStatus status;
 
   @Column(name = "created_at")
   private LocalDateTime createdAt;

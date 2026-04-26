@@ -6,6 +6,8 @@ import com.kapotiabi.entity.JobRequestEntity;
 import com.kapotiabi.entity.OfferSlotEntity;
 import com.kapotiabi.entity.RepairShopEntity;
 import com.kapotiabi.entity.ShopOfferEntity;
+import com.kapotiabi.enums.JobRequestStatus;
+import com.kapotiabi.enums.ShopOfferStatus;
 import com.kapotiabi.exception.ForbiddenException;
 import com.kapotiabi.exception.NotFoundException;
 import com.kapotiabi.repository.JobRequestRepository;
@@ -81,13 +83,13 @@ public class ShopOfferService {
             .partsTier(req.partsTier())
             .estimatedDurationHours(req.estimatedDurationHours())
             .validUntil(req.validUntil())
-            .status("pending")
+            .status(ShopOfferStatus.PENDING)
             .createdAt(LocalDateTime.now())
             .build();
     offer = shopOfferRepository.save(offer);
 
-    if ("pending".equals(jobRequest.getStatus())) {
-      jobRequest.setStatus("offers_received");
+    if (jobRequest.getStatus() == JobRequestStatus.PENDING) {
+      jobRequest.setStatus(JobRequestStatus.OFFERS_RECEIVED);
       jobRequestRepository.save(jobRequest);
     }
 
@@ -122,7 +124,8 @@ public class ShopOfferService {
     if (!authUserId.equals(jobRequest.getUser().getId())) {
       throw new ForbiddenException("You don't have access to this offer");
     }
-    offer.setStatus("rejected");
+    offer.getStatus().assertCanTransitionTo(ShopOfferStatus.REJECTED);
+    offer.setStatus(ShopOfferStatus.REJECTED);
     offer = shopOfferRepository.save(offer);
     return ShopOfferResponse.from(offer, offerSlotRepository.findByOfferId(id));
   }

@@ -10,6 +10,7 @@ import com.kapotiabi.dto.response.JobRequestResponse;
 import com.kapotiabi.entity.CarEntity;
 import com.kapotiabi.entity.JobRequestEntity;
 import com.kapotiabi.entity.UserEntity;
+import com.kapotiabi.enums.JobRequestStatus;
 import com.kapotiabi.exception.ForbiddenException;
 import com.kapotiabi.exception.NotFoundException;
 import com.kapotiabi.repository.CarRepository;
@@ -43,7 +44,7 @@ class JobRequestServiceTest {
         .user(UserEntity.builder().id(5L).build())
         .car(CarEntity.builder().id(3L).build())
         .description("Oil change")
-        .status("pending")
+        .status(JobRequestStatus.PENDING)
         .city("Tallinn")
         .county("Harju")
         .createdAt(LocalDateTime.now())
@@ -64,7 +65,7 @@ class JobRequestServiceTest {
   @Test
   void getAvailable_byCity() {
     Pageable pageable = PageRequest.of(0, 20);
-    when(jobRequestRepository.findByStatusAndCity("pending", "Tallinn", pageable))
+    when(jobRequestRepository.findByStatusAndCity(JobRequestStatus.PENDING, "Tallinn", pageable))
         .thenReturn(new PageImpl<>(List.of(buildRequest())));
 
     Page<JobRequestResponse> result = jobRequestService.getAvailable("Tallinn", null, pageable);
@@ -76,7 +77,7 @@ class JobRequestServiceTest {
   @Test
   void getAvailable_byCounty() {
     Pageable pageable = PageRequest.of(0, 20);
-    when(jobRequestRepository.findByStatusAndCounty("pending", "Harju", pageable))
+    when(jobRequestRepository.findByStatusAndCounty(JobRequestStatus.PENDING, "Harju", pageable))
         .thenReturn(new PageImpl<>(List.of(buildRequest())));
 
     Page<JobRequestResponse> result = jobRequestService.getAvailable(null, "Harju", pageable);
@@ -103,7 +104,7 @@ class JobRequestServiceTest {
 
     JobRequestResponse response = jobRequestService.create(req, 5L);
 
-    assertThat(response.status()).isEqualTo("pending");
+    assertThat(response.status()).isEqualTo(JobRequestStatus.PENDING);
     assertThat(response.userId()).isEqualTo(5L);
   }
 
@@ -116,7 +117,7 @@ class JobRequestServiceTest {
 
     JobRequestResponse response = jobRequestService.cancel(1L, 5L);
 
-    assertThat(response.status()).isEqualTo("cancelled");
+    assertThat(response.status()).isEqualTo(JobRequestStatus.CANCELLED);
   }
 
   @Test

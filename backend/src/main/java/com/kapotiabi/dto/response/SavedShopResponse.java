@@ -2,6 +2,7 @@ package com.kapotiabi.dto.response;
 
 import com.kapotiabi.entity.RepairShopEntity;
 import com.kapotiabi.entity.UserSavedShopEntity;
+import com.kapotiabi.enums.RepairShopStatus;
 import java.time.LocalDateTime;
 
 public record SavedShopResponse(
@@ -10,7 +11,7 @@ public record SavedShopResponse(
     String city,
     String county,
     String phone,
-    String status,
+    RepairShopStatus status,
     LocalDateTime savedAt) {
 
   public static SavedShopResponse from(UserSavedShopEntity saved, RepairShopEntity shop) {

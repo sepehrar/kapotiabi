@@ -12,6 +12,7 @@ import com.kapotiabi.dto.response.ShopServiceCategoryResponse;
 import com.kapotiabi.entity.RepairShopEntity;
 import com.kapotiabi.entity.ShopServiceCategoryEntity;
 import com.kapotiabi.entity.UserEntity;
+import com.kapotiabi.enums.RepairShopStatus;
 import com.kapotiabi.exception.ForbiddenException;
 import com.kapotiabi.exception.NotFoundException;
 import com.kapotiabi.repository.RepairShopRepository;
@@ -50,7 +51,7 @@ class RepairShopServiceTest {
         .name("Test Garage")
         .city("Tallinn")
         .county("Harju")
-        .status("active")
+        .status(RepairShopStatus.ACTIVE)
         .createdAt(LocalDateTime.now())
         .updatedAt(LocalDateTime.now())
         .build();
@@ -70,7 +71,7 @@ class RepairShopServiceTest {
   @Test
   void getAll_byCity() {
     var pageable = PageRequest.of(0, 20);
-    when(repairShopRepository.findByStatusAndCity("active", "Tallinn", pageable))
+    when(repairShopRepository.findByStatusAndCity(RepairShopStatus.ACTIVE, "Tallinn", pageable))
         .thenReturn(new PageImpl<>(List.of(buildShop())));
 
     var result = repairShopService.getAll("Tallinn", null, pageable);
@@ -98,15 +99,14 @@ class RepairShopServiceTest {
 
   @Test
   void create() {
-    var req =
-        new RepairShopRequest("New Shop", null, "Tartu", null, null, null, null, null, "active");
+    var req = new RepairShopRequest("New Shop", null, "Tartu", null, null, null, null, null);
     var saved =
         RepairShopEntity.builder()
             .id(2L)
             .owner(UserEntity.builder().id(5L).build())
             .name("New Shop")
             .city("Tartu")
-            .status("active")
+            .status(RepairShopStatus.DRAFT)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .build();
@@ -116,6 +116,7 @@ class RepairShopServiceTest {
 
     assertThat(response.id()).isEqualTo(2L);
     assertThat(response.city()).isEqualTo("Tartu");
+    assertThat(response.status()).isEqualTo(RepairShopStatus.DRAFT);
   }
 
   @Test
@@ -125,24 +126,48 @@ class RepairShopServiceTest {
     when(repairShopRepository.save(any(RepairShopEntity.class)))
         .thenAnswer(inv -> inv.getArgument(0));
 
-    var req =
-        new RepairShopRequest(
-            "Updated Garage", null, "Narva", null, null, null, null, null, "active");
+    var req = new RepairShopRequest("Updated Garage", null, "Narva", null, null, null, null, null);
     var response = repairShopService.update(1L, req, 5L);
 
     assertThat(response.name()).isEqualTo("Updated Garage");
     assertThat(response.city()).isEqualTo("Narva");
+    assertThat(response.status()).isEqualTo(RepairShopStatus.ACTIVE);
   }
 
   @Test
   void update_wrongOwner_throwsForbidden() {
     when(repairShopRepository.findById(1L)).thenReturn(Optional.of(buildShop()));
 
-    var req =
-        new RepairShopRequest(
-            "Updated Garage", null, "Narva", null, null, null, null, null, "active");
+    var req = new RepairShopRequest("Updated Garage", null, "Narva", null, null, null, null, null);
     assertThatThrownBy(() -> repairShopService.update(1L, req, 99L))
         .isInstanceOf(ForbiddenException.class);
+  }
+
+  @Test
+  void updateShopStatus_approveDraft_setsActive() {
+    var draft =
+        RepairShopEntity.builder()
+            .id(1L)
+            .owner(UserEntity.builder().id(5L).build())
+            .name("Draft Shop")
+            .status(RepairShopStatus.DRAFT)
+            .build();
+    when(repairShopRepository.findById(1L)).thenReturn(Optional.of(draft));
+    when(repairShopRepository.save(any(RepairShopEntity.class)))
+        .thenAnswer(inv -> inv.getArgument(0));
+
+    var response = repairShopService.updateShopStatus(1L, "approve");
+
+    assertThat(response.status()).isEqualTo(RepairShopStatus.ACTIVE);
+  }
+
+  @Test
+  void updateShopStatus_approveAlreadyActive_throwsIllegalState() {
+    when(repairShopRepository.findById(1L)).thenReturn(Optional.of(buildShop()));
+
+    assertThatThrownBy(() -> repairShopService.updateShopStatus(1L, "approve"))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("cannot transition from ACTIVE to ACTIVE");
   }
 
   @Test

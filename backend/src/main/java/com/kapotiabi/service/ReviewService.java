@@ -4,6 +4,7 @@ import com.kapotiabi.dto.request.ReviewRequest;
 import com.kapotiabi.dto.response.ReviewResponse;
 import com.kapotiabi.entity.BookingEntity;
 import com.kapotiabi.entity.ReviewEntity;
+import com.kapotiabi.enums.BookingStatus;
 import com.kapotiabi.exception.ForbiddenException;
 import com.kapotiabi.exception.NotFoundException;
 import com.kapotiabi.repository.BookingRepository;
@@ -27,7 +28,7 @@ public class ReviewService {
         bookingRepository
             .findById(bookingId)
             .orElseThrow(() -> new NotFoundException("Booking not found: " + bookingId));
-    if (!"completed".equals(booking.getStatus())) {
+    if (booking.getStatus() != BookingStatus.COMPLETED) {
       throw new IllegalStateException("Booking is not completed");
     }
     if (!authUserId.equals(booking.getUser().getId())) {

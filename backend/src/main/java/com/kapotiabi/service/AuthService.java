@@ -9,6 +9,7 @@ import com.kapotiabi.dto.ResetPasswordRequest;
 import com.kapotiabi.entity.PasswordResetTokenEntity;
 import com.kapotiabi.entity.RepairShopEntity;
 import com.kapotiabi.entity.UserEntity;
+import com.kapotiabi.enums.RepairShopStatus;
 import com.kapotiabi.enums.UserRole;
 import com.kapotiabi.exception.DuplicateEmailException;
 import com.kapotiabi.exception.InvalidCredentialsException;
@@ -60,16 +61,16 @@ public class AuthService {
             .build();
     userRepository.save(user);
 
-    String shopStatus = null;
+    RepairShopStatus shopStatus = null;
     if (req.getRole() == UserRole.SHOP_OWNER) {
       RepairShopEntity shop =
           RepairShopEntity.builder()
               .owner(user)
               .name(user.getFirstName() + " " + user.getLastName() + "'s Shop")
-              .status("draft")
+              .status(RepairShopStatus.DRAFT)
               .build();
       repairShopRepository.save(shop);
-      shopStatus = "draft";
+      shopStatus = RepairShopStatus.DRAFT;
     }
 
     return buildAuthResponse(user, shopStatus);
@@ -83,7 +84,7 @@ public class AuthService {
       throw new InvalidCredentialsException();
     }
 
-    String shopStatus = null;
+    RepairShopStatus shopStatus = null;
     if (user.getRole() == UserRole.SHOP_OWNER) {
       shopStatus =
           repairShopRepository
@@ -161,7 +162,7 @@ public class AuthService {
     userRepository.save(user);
   }
 
-  private AuthResponse buildAuthResponse(UserEntity user, String shopStatus) {
+  private AuthResponse buildAuthResponse(UserEntity user, RepairShopStatus shopStatus) {
     String token =
         jwtTokenProvider.generateToken(user.getId(), user.getEmail(), user.getRole().getDbValue());
     Instant expiresAt = jwtTokenProvider.getExpiry(token);

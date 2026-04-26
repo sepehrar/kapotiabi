@@ -13,6 +13,7 @@ import com.kapotiabi.entity.RepairShopEntity;
 import com.kapotiabi.entity.ReviewEntity;
 import com.kapotiabi.entity.ShopOfferEntity;
 import com.kapotiabi.entity.UserEntity;
+import com.kapotiabi.enums.BookingStatus;
 import com.kapotiabi.exception.NotFoundException;
 import com.kapotiabi.repository.BookingRepository;
 import com.kapotiabi.repository.ReviewRepository;
@@ -33,7 +34,7 @@ class ReviewServiceTest {
 
   @InjectMocks private ReviewService reviewService;
 
-  private BookingEntity buildBooking(String status) {
+  private BookingEntity buildBooking(BookingStatus status) {
     return BookingEntity.builder()
         .id(1L)
         .offer(ShopOfferEntity.builder().id(2L).build())
@@ -60,7 +61,8 @@ class ReviewServiceTest {
 
   @Test
   void submit_success() {
-    when(bookingRepository.findById(1L)).thenReturn(Optional.of(buildBooking("completed")));
+    when(bookingRepository.findById(1L))
+        .thenReturn(Optional.of(buildBooking(BookingStatus.COMPLETED)));
     when(reviewRepository.findByBookingId(1L)).thenReturn(Optional.empty());
     ReviewEntity saved = buildReview();
     when(reviewRepository.save(any(ReviewEntity.class))).thenReturn(saved);
@@ -74,7 +76,8 @@ class ReviewServiceTest {
 
   @Test
   void submit_notCompleted() {
-    when(bookingRepository.findById(1L)).thenReturn(Optional.of(buildBooking("confirmed")));
+    when(bookingRepository.findById(1L))
+        .thenReturn(Optional.of(buildBooking(BookingStatus.CONFIRMED)));
 
     ReviewRequest req = new ReviewRequest(5, "Great!");
     assertThatThrownBy(() -> reviewService.submit(1L, req, 5L))
@@ -84,7 +87,8 @@ class ReviewServiceTest {
 
   @Test
   void submit_wrongUser_throwsForbidden() {
-    when(bookingRepository.findById(1L)).thenReturn(Optional.of(buildBooking("completed")));
+    when(bookingRepository.findById(1L))
+        .thenReturn(Optional.of(buildBooking(BookingStatus.COMPLETED)));
 
     ReviewRequest req = new ReviewRequest(5, "Great!");
     assertThatThrownBy(() -> reviewService.submit(1L, req, 999L))
@@ -93,7 +97,8 @@ class ReviewServiceTest {
 
   @Test
   void submit_alreadyExists() {
-    when(bookingRepository.findById(1L)).thenReturn(Optional.of(buildBooking("completed")));
+    when(bookingRepository.findById(1L))
+        .thenReturn(Optional.of(buildBooking(BookingStatus.COMPLETED)));
     when(reviewRepository.findByBookingId(1L)).thenReturn(Optional.of(buildReview()));
 
     ReviewRequest req = new ReviewRequest(4, "Good.");
