@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    hikari:
+      minimum-idle: 0
+      maximum-pool-size: 5
+      connection-timeout: 30000
+      initialization-fail-timeout: -1
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+
+jwt:
+  secret: integration-test-secret-must-be-at-least-256-bits-long-padding-padding
+  expiration-ms: 86400000
+
+app:
+  upload-dir: build/test-uploads
+  cors:
+    allowed-origins: http://localhost:3000
