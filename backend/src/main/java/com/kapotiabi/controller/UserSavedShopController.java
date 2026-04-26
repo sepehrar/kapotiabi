@@ -29,9 +29,9 @@ public class UserSavedShopController {
   @GetMapping
   @Operation(summary = "Get saved shops for the authenticated user")
   public ResponseEntity<PagedResponse<SavedShopResponse>> getSaved(
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "10") int size) {
-    return ResponseEntity.ok(userSavedShopService.getSaved(SecurityUtils.getAuthUserId(), page, size));
+      @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+    return ResponseEntity.ok(
+        userSavedShopService.getSaved(SecurityUtils.getAuthUserId(), page, size));
   }
 
   @PostMapping("/{shopId}")
