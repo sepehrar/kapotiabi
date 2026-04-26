@@ -6,6 +6,9 @@ import com.kapotiabi.entity.JobRequestEntity;
 import com.kapotiabi.entity.OfferSlotEntity;
 import com.kapotiabi.entity.RepairShopEntity;
 import com.kapotiabi.entity.ShopOfferEntity;
+import com.kapotiabi.enums.BookingStatus;
+import com.kapotiabi.enums.JobRequestStatus;
+import com.kapotiabi.enums.ShopOfferStatus;
 import com.kapotiabi.exception.ForbiddenException;
 import com.kapotiabi.exception.NotFoundException;
 import com.kapotiabi.repository.BookingRepository;
@@ -79,10 +82,12 @@ public class BookingService {
       throw new ForbiddenException("You don't have access to this job request");
     }
 
-    offer.setStatus("accepted");
+    offer.getStatus().assertCanTransitionTo(ShopOfferStatus.ACCEPTED);
+    offer.setStatus(ShopOfferStatus.ACCEPTED);
     shopOfferRepository.save(offer);
 
-    jobRequest.setStatus("booked");
+    jobRequest.getStatus().assertCanTransitionTo(JobRequestStatus.BOOKED);
+    jobRequest.setStatus(JobRequestStatus.BOOKED);
     jobRequest.setUpdatedAt(LocalDateTime.now());
     jobRequestRepository.save(jobRequest);
 
@@ -95,7 +100,7 @@ public class BookingService {
             .shop(offer.getShop())
             .scheduledAt(slot.getStartsAt())
             .confirmedByShop(false)
-            .status("awaiting_shop")
+            .status(BookingStatus.AWAITING_SHOP)
             .createdAt(now)
             .updatedAt(now)
             .build();
@@ -105,14 +110,11 @@ public class BookingService {
   @Transactional
   public BookingResponse confirm(Long id, Long authUserId) {
     BookingEntity booking = findOrThrow(id);
-    if (!"awaiting_shop".equals(booking.getStatus())) {
-      throw new IllegalStateException(
-          "Booking cannot be confirmed from status: " + booking.getStatus());
-    }
+    booking.getStatus().assertCanTransitionTo(BookingStatus.CONFIRMED);
     verifyShopOwner(authUserId, booking.getShop().getId());
     booking.setConfirmedByShop(true);
     booking.setShopConfirmedAt(LocalDateTime.now());
-    booking.setStatus("confirmed");
+    booking.setStatus(BookingStatus.CONFIRMED);
     booking.setUpdatedAt(LocalDateTime.now());
     return BookingResponse.from(bookingRepository.save(booking));
   }
@@ -120,7 +122,7 @@ public class BookingService {
   @Transactional
   public BookingResponse schedule(Long id, LocalDateTime scheduledAt, Long authUserId) {
     BookingEntity booking = findOrThrow(id);
-    if (!"confirmed".equals(booking.getStatus())) {
+    if (booking.getStatus() != BookingStatus.CONFIRMED) {
       throw new IllegalStateException(
           "Booking cannot be scheduled from status: " + booking.getStatus());
     }
@@ -133,12 +135,9 @@ public class BookingService {
   @Transactional
   public BookingResponse complete(Long id, Long authUserId) {
     BookingEntity booking = findOrThrow(id);
-    if (!"confirmed".equals(booking.getStatus())) {
-      throw new IllegalStateException(
-          "Booking cannot be completed from status: " + booking.getStatus());
-    }
+    booking.getStatus().assertCanTransitionTo(BookingStatus.COMPLETED);
     verifyShopOwner(authUserId, booking.getShop().getId());
-    booking.setStatus("completed");
+    booking.setStatus(BookingStatus.COMPLETED);
     booking.setUpdatedAt(LocalDateTime.now());
     return BookingResponse.from(bookingRepository.save(booking));
   }
@@ -146,10 +145,7 @@ public class BookingService {
   @Transactional
   public BookingResponse cancel(Long id, Long authUserId) {
     BookingEntity booking = findOrThrow(id);
-    if ("completed".equals(booking.getStatus()) || "cancelled".equals(booking.getStatus())) {
-      throw new IllegalStateException(
-          "Booking cannot be cancelled from status: " + booking.getStatus());
-    }
+    booking.getStatus().assertCanTransitionTo(BookingStatus.CANCELLED);
     if (!authUserId.equals(booking.getUser().getId())) {
       boolean isShopOwner =
           repairShopRepository
@@ -160,7 +156,7 @@ public class BookingService {
         throw new ForbiddenException("You don't have access to this booking");
       }
     }
-    booking.setStatus("cancelled");
+    booking.setStatus(BookingStatus.CANCELLED);
     booking.setUpdatedAt(LocalDateTime.now());
     return BookingResponse.from(bookingRepository.save(booking));
   }

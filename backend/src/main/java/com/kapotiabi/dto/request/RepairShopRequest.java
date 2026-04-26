@@ -12,5 +12,4 @@ public record RepairShopRequest(
     @Size(max = 20) String phone,
     @Email @Size(max = 255) String email,
     @Size(max = 200) String website,
-    @Size(max = 500) String googleMapsUrl,
-    String status) {}
+    @Size(max = 500) String googleMapsUrl) {}

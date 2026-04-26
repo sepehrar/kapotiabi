@@ -1,6 +1,7 @@
 package com.kapotiabi.repository;
 
 import com.kapotiabi.entity.RepairShopEntity;
+import com.kapotiabi.enums.RepairShopStatus;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -14,15 +15,17 @@ public interface RepairShopRepository extends JpaRepository<RepairShopEntity, Lo
 
   List<RepairShopEntity> findByCounty(String county);
 
-  List<RepairShopEntity> findByStatus(String status);
+  List<RepairShopEntity> findByStatus(RepairShopStatus status);
 
-  Page<RepairShopEntity> findByStatus(String status, Pageable pageable);
+  Page<RepairShopEntity> findByStatus(RepairShopStatus status, Pageable pageable);
 
-  List<RepairShopEntity> findByStatusAndCity(String status, String city);
+  List<RepairShopEntity> findByStatusAndCity(RepairShopStatus status, String city);
 
-  Page<RepairShopEntity> findByStatusAndCity(String status, String city, Pageable pageable);
+  Page<RepairShopEntity> findByStatusAndCity(
+      RepairShopStatus status, String city, Pageable pageable);
 
-  List<RepairShopEntity> findByStatusAndCounty(String status, String county);
+  List<RepairShopEntity> findByStatusAndCounty(RepairShopStatus status, String county);
 
-  Page<RepairShopEntity> findByStatusAndCounty(String status, String county, Pageable pageable);
+  Page<RepairShopEntity> findByStatusAndCounty(
+      RepairShopStatus status, String county, Pageable pageable);
 }

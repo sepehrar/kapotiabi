@@ -3,6 +3,7 @@ package com.kapotiabi.service;
 import com.kapotiabi.dto.request.JobRequestRequest;
 import com.kapotiabi.dto.response.JobRequestResponse;
 import com.kapotiabi.entity.JobRequestEntity;
+import com.kapotiabi.enums.JobRequestStatus;
 import com.kapotiabi.exception.ForbiddenException;
 import com.kapotiabi.exception.NotFoundException;
 import com.kapotiabi.repository.CarRepository;
@@ -34,14 +35,16 @@ public class JobRequestService {
   public Page<JobRequestResponse> getAvailable(String city, String county, Pageable pageable) {
     if (city != null) {
       return jobRequestRepository
-          .findByStatusAndCity("pending", city, pageable)
+          .findByStatusAndCity(JobRequestStatus.PENDING, city, pageable)
           .map(JobRequestResponse::from);
     } else if (county != null) {
       return jobRequestRepository
-          .findByStatusAndCounty("pending", county, pageable)
+          .findByStatusAndCounty(JobRequestStatus.PENDING, county, pageable)
           .map(JobRequestResponse::from);
     } else {
-      return jobRequestRepository.findByStatus("pending", pageable).map(JobRequestResponse::from);
+      return jobRequestRepository
+          .findByStatus(JobRequestStatus.PENDING, pageable)
+          .map(JobRequestResponse::from);
     }
   }
 
@@ -63,7 +66,7 @@ public class JobRequestService {
             .city(req.city())
             .county(req.county())
             .offerDeadline(req.offerDeadline())
-            .status("pending")
+            .status(JobRequestStatus.PENDING)
             .createdAt(now)
             .updatedAt(now)
             .build();
@@ -92,7 +95,8 @@ public class JobRequestService {
     JobRequestEntity entity = findOrThrow(id);
     if (!authUserId.equals(entity.getUser().getId()))
       throw new ForbiddenException("You don't have access to this job request");
-    entity.setStatus("cancelled");
+    entity.getStatus().assertCanTransitionTo(JobRequestStatus.CANCELLED);
+    entity.setStatus(JobRequestStatus.CANCELLED);
     entity.setUpdatedAt(LocalDateTime.now());
     return JobRequestResponse.from(jobRequestRepository.save(entity));
   }

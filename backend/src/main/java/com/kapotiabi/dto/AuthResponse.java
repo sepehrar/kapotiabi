@@ -1,6 +1,7 @@
 package com.kapotiabi.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kapotiabi.enums.RepairShopStatus;
 import java.time.Instant;
 import lombok.Builder;
 import lombok.Data;
@@ -13,5 +14,5 @@ public class AuthResponse {
   private Instant expiresAt;
   private String role;
   private Long userId;
-  private String shopStatus; // null for car_owner
+  private RepairShopStatus shopStatus;
 }

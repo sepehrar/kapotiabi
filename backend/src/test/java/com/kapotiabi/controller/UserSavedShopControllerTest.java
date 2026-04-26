@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.kapotiabi.dto.response.PagedResponse;
 import com.kapotiabi.dto.response.SavedShopResponse;
+import com.kapotiabi.enums.RepairShopStatus;
 import com.kapotiabi.exception.AlreadySavedException;
 import com.kapotiabi.exception.GlobalExceptionHandler;
 import com.kapotiabi.exception.NotFoundException;
@@ -56,7 +57,7 @@ class UserSavedShopControllerTest {
         "Tallinn",
         "Harju",
         "+372 555 1234",
-        "active",
+        RepairShopStatus.ACTIVE,
         LocalDateTime.now());
   }
 

@@ -2,6 +2,7 @@ package com.kapotiabi.dto.response;
 
 import com.kapotiabi.entity.OfferSlotEntity;
 import com.kapotiabi.entity.ShopOfferEntity;
+import com.kapotiabi.enums.ShopOfferStatus;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,7 +17,7 @@ public record ShopOfferResponse(
     BigDecimal estimatedDurationHours,
     LocalDateTime validUntil,
     String pdfUrl,
-    String status,
+    ShopOfferStatus status,
     LocalDateTime createdAt,
     List<OfferSlotResponse> slots) {
 

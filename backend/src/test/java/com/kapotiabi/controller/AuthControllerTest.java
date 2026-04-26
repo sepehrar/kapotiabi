@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.kapotiabi.dto.*;
+import com.kapotiabi.enums.RepairShopStatus;
 import com.kapotiabi.exception.*;
 import com.kapotiabi.service.AuthService;
 import java.time.Instant;
@@ -75,7 +76,7 @@ class AuthControllerTest {
             .expiresAt(Instant.parse("2026-04-07T10:00:00Z"))
             .role("shop_owner")
             .userId(2L)
-            .shopStatus("draft")
+            .shopStatus(RepairShopStatus.DRAFT)
             .build();
     when(authService.register(any())).thenReturn(shopResponse);
 

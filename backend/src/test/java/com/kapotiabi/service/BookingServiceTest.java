@@ -13,6 +13,9 @@ import com.kapotiabi.entity.OfferSlotEntity;
 import com.kapotiabi.entity.RepairShopEntity;
 import com.kapotiabi.entity.ShopOfferEntity;
 import com.kapotiabi.entity.UserEntity;
+import com.kapotiabi.enums.BookingStatus;
+import com.kapotiabi.enums.JobRequestStatus;
+import com.kapotiabi.enums.ShopOfferStatus;
 import com.kapotiabi.exception.ForbiddenException;
 import com.kapotiabi.exception.NotFoundException;
 import com.kapotiabi.repository.BookingRepository;
@@ -50,7 +53,7 @@ class BookingServiceTest {
   private static final Long OFFER_ID = 2L;
   private static final Long SLOT_ID = 7L;
 
-  private BookingEntity buildBooking(String status) {
+  private BookingEntity buildBooking(BookingStatus status) {
     return BookingEntity.builder()
         .id(1L)
         .offer(ShopOfferEntity.builder().id(OFFER_ID).build())
@@ -71,7 +74,7 @@ class BookingServiceTest {
         .jobRequest(JobRequestEntity.builder().id(10L).build())
         .shop(RepairShopEntity.builder().id(SHOP_ID).build())
         .priceEstimate(new BigDecimal("100.00"))
-        .status("pending")
+        .status(ShopOfferStatus.PENDING)
         .createdAt(LocalDateTime.now())
         .build();
   }
@@ -82,7 +85,7 @@ class BookingServiceTest {
         .user(UserEntity.builder().id(CAR_OWNER_ID).build())
         .car(CarEntity.builder().id(7L).build())
         .description("Oil change")
-        .status("offers_received")
+        .status(JobRequestStatus.OFFERS_RECEIVED)
         .createdAt(LocalDateTime.now())
         .updatedAt(LocalDateTime.now())
         .build();
@@ -116,19 +119,19 @@ class BookingServiceTest {
     when(jobRequestRepository.save(any(JobRequestEntity.class)))
         .thenAnswer(inv -> inv.getArgument(0));
     when(bookingRepository.save(any(BookingEntity.class)))
-        .thenReturn(buildBooking("awaiting_shop"));
+        .thenReturn(buildBooking(BookingStatus.AWAITING_SHOP));
 
     BookingResponse response = bookingService.createFromOffer(OFFER_ID, SLOT_ID, CAR_OWNER_ID);
 
     assertThat(response.offerId()).isEqualTo(OFFER_ID);
-    assertThat(response.status()).isEqualTo("awaiting_shop");
+    assertThat(response.status()).isEqualTo(BookingStatus.AWAITING_SHOP);
     assertThat(response.scheduledAt()).isEqualTo(LocalDateTime.of(2026, 5, 10, 10, 0));
   }
 
   @Test
   void createFromOffer_alreadyExists() {
     when(bookingRepository.findByOfferId(OFFER_ID))
-        .thenReturn(Optional.of(buildBooking("awaiting_shop")));
+        .thenReturn(Optional.of(buildBooking(BookingStatus.AWAITING_SHOP)));
 
     assertThatThrownBy(() -> bookingService.createFromOffer(OFFER_ID, SLOT_ID, CAR_OWNER_ID))
         .isInstanceOf(IllegalStateException.class)
@@ -171,28 +174,31 @@ class BookingServiceTest {
 
   @Test
   void confirm_success() {
-    when(bookingRepository.findById(1L)).thenReturn(Optional.of(buildBooking("awaiting_shop")));
+    when(bookingRepository.findById(1L))
+        .thenReturn(Optional.of(buildBooking(BookingStatus.AWAITING_SHOP)));
     when(repairShopRepository.findByOwnerId(SHOP_OWNER_ID)).thenReturn(Optional.of(buildShop()));
     when(bookingRepository.save(any(BookingEntity.class))).thenAnswer(inv -> inv.getArgument(0));
 
     BookingResponse response = bookingService.confirm(1L, SHOP_OWNER_ID);
 
-    assertThat(response.status()).isEqualTo("confirmed");
+    assertThat(response.status()).isEqualTo(BookingStatus.CONFIRMED);
     assertThat(response.confirmedByShop()).isTrue();
   }
 
   @Test
   void confirm_wrongStatus_throwsIllegalState() {
-    when(bookingRepository.findById(1L)).thenReturn(Optional.of(buildBooking("confirmed")));
+    when(bookingRepository.findById(1L))
+        .thenReturn(Optional.of(buildBooking(BookingStatus.CONFIRMED)));
 
     assertThatThrownBy(() -> bookingService.confirm(1L, SHOP_OWNER_ID))
         .isInstanceOf(IllegalStateException.class)
-        .hasMessageContaining("cannot be confirmed");
+        .hasMessageContaining("cannot transition from CONFIRMED to CONFIRMED");
   }
 
   @Test
   void confirm_wrongShop_throwsForbidden() {
-    when(bookingRepository.findById(1L)).thenReturn(Optional.of(buildBooking("awaiting_shop")));
+    when(bookingRepository.findById(1L))
+        .thenReturn(Optional.of(buildBooking(BookingStatus.AWAITING_SHOP)));
     RepairShopEntity wrongShop =
         RepairShopEntity.builder()
             .id(99L)
@@ -206,7 +212,8 @@ class BookingServiceTest {
 
   @Test
   void schedule_success() {
-    when(bookingRepository.findById(1L)).thenReturn(Optional.of(buildBooking("confirmed")));
+    when(bookingRepository.findById(1L))
+        .thenReturn(Optional.of(buildBooking(BookingStatus.CONFIRMED)));
     when(repairShopRepository.findByOwnerId(SHOP_OWNER_ID)).thenReturn(Optional.of(buildShop()));
     when(bookingRepository.save(any(BookingEntity.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -218,7 +225,8 @@ class BookingServiceTest {
 
   @Test
   void schedule_wrongStatus_throwsIllegalState() {
-    when(bookingRepository.findById(1L)).thenReturn(Optional.of(buildBooking("awaiting_shop")));
+    when(bookingRepository.findById(1L))
+        .thenReturn(Optional.of(buildBooking(BookingStatus.AWAITING_SHOP)));
 
     assertThatThrownBy(() -> bookingService.schedule(1L, LocalDateTime.now(), SHOP_OWNER_ID))
         .isInstanceOf(IllegalStateException.class)
@@ -227,57 +235,83 @@ class BookingServiceTest {
 
   @Test
   void complete_success() {
-    when(bookingRepository.findById(1L)).thenReturn(Optional.of(buildBooking("confirmed")));
+    when(bookingRepository.findById(1L))
+        .thenReturn(Optional.of(buildBooking(BookingStatus.CONFIRMED)));
     when(repairShopRepository.findByOwnerId(SHOP_OWNER_ID)).thenReturn(Optional.of(buildShop()));
     when(bookingRepository.save(any(BookingEntity.class))).thenAnswer(inv -> inv.getArgument(0));
 
     BookingResponse response = bookingService.complete(1L, SHOP_OWNER_ID);
 
-    assertThat(response.status()).isEqualTo("completed");
+    assertThat(response.status()).isEqualTo(BookingStatus.COMPLETED);
   }
 
   @Test
   void complete_wrongStatus_throwsIllegalState() {
-    when(bookingRepository.findById(1L)).thenReturn(Optional.of(buildBooking("awaiting_shop")));
+    when(bookingRepository.findById(1L))
+        .thenReturn(Optional.of(buildBooking(BookingStatus.AWAITING_SHOP)));
 
     assertThatThrownBy(() -> bookingService.complete(1L, SHOP_OWNER_ID))
         .isInstanceOf(IllegalStateException.class)
-        .hasMessageContaining("cannot be completed");
+        .hasMessageContaining("cannot transition from AWAITING_SHOP to COMPLETED");
   }
 
   @Test
   void cancel_asCarOwner_success() {
-    when(bookingRepository.findById(1L)).thenReturn(Optional.of(buildBooking("confirmed")));
+    when(bookingRepository.findById(1L))
+        .thenReturn(Optional.of(buildBooking(BookingStatus.CONFIRMED)));
     when(bookingRepository.save(any(BookingEntity.class))).thenAnswer(inv -> inv.getArgument(0));
 
     BookingResponse response = bookingService.cancel(1L, CAR_OWNER_ID);
 
-    assertThat(response.status()).isEqualTo("cancelled");
+    assertThat(response.status()).isEqualTo(BookingStatus.CANCELLED);
   }
 
   @Test
   void cancel_asShopOwner_success() {
-    when(bookingRepository.findById(1L)).thenReturn(Optional.of(buildBooking("awaiting_shop")));
+    when(bookingRepository.findById(1L))
+        .thenReturn(Optional.of(buildBooking(BookingStatus.AWAITING_SHOP)));
     when(repairShopRepository.findByOwnerId(SHOP_OWNER_ID)).thenReturn(Optional.of(buildShop()));
     when(bookingRepository.save(any(BookingEntity.class))).thenAnswer(inv -> inv.getArgument(0));
 
     BookingResponse response = bookingService.cancel(1L, SHOP_OWNER_ID);
 
-    assertThat(response.status()).isEqualTo("cancelled");
+    assertThat(response.status()).isEqualTo(BookingStatus.CANCELLED);
   }
 
   @Test
   void cancel_alreadyCancelled_throwsIllegalState() {
-    when(bookingRepository.findById(1L)).thenReturn(Optional.of(buildBooking("cancelled")));
+    when(bookingRepository.findById(1L))
+        .thenReturn(Optional.of(buildBooking(BookingStatus.CANCELLED)));
 
     assertThatThrownBy(() -> bookingService.cancel(1L, CAR_OWNER_ID))
         .isInstanceOf(IllegalStateException.class)
-        .hasMessageContaining("cannot be cancelled");
+        .hasMessageContaining("cannot transition from CANCELLED to CANCELLED");
+  }
+
+  @Test
+  void cancel_alreadyCompleted_throwsIllegalState() {
+    when(bookingRepository.findById(1L))
+        .thenReturn(Optional.of(buildBooking(BookingStatus.COMPLETED)));
+
+    assertThatThrownBy(() -> bookingService.cancel(1L, CAR_OWNER_ID))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("cannot transition from COMPLETED to CANCELLED");
+  }
+
+  @Test
+  void confirm_alreadyCompleted_throwsIllegalState() {
+    when(bookingRepository.findById(1L))
+        .thenReturn(Optional.of(buildBooking(BookingStatus.COMPLETED)));
+
+    assertThatThrownBy(() -> bookingService.confirm(1L, SHOP_OWNER_ID))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("cannot transition from COMPLETED to CONFIRMED");
   }
 
   @Test
   void cancel_unrelatedUser_throwsForbidden() {
-    when(bookingRepository.findById(1L)).thenReturn(Optional.of(buildBooking("confirmed")));
+    when(bookingRepository.findById(1L))
+        .thenReturn(Optional.of(buildBooking(BookingStatus.CONFIRMED)));
     when(repairShopRepository.findByOwnerId(999L)).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> bookingService.cancel(1L, 999L))
@@ -295,7 +329,7 @@ class BookingServiceTest {
   void getByUser() {
     Pageable pageable = PageRequest.of(0, 20);
     when(bookingRepository.findByUserId(CAR_OWNER_ID, pageable))
-        .thenReturn(new PageImpl<>(List.of(buildBooking("confirmed"))));
+        .thenReturn(new PageImpl<>(List.of(buildBooking(BookingStatus.CONFIRMED))));
 
     Page<BookingResponse> result = bookingService.getByUser(CAR_OWNER_ID, pageable);
 
@@ -308,7 +342,7 @@ class BookingServiceTest {
     Pageable pageable = PageRequest.of(0, 20);
     when(repairShopRepository.findById(SHOP_ID)).thenReturn(Optional.of(buildShop()));
     when(bookingRepository.findByShopId(SHOP_ID, pageable))
-        .thenReturn(new PageImpl<>(List.of(buildBooking("confirmed"))));
+        .thenReturn(new PageImpl<>(List.of(buildBooking(BookingStatus.CONFIRMED))));
 
     Page<BookingResponse> result = bookingService.getByShop(SHOP_ID, SHOP_OWNER_ID, pageable);
 

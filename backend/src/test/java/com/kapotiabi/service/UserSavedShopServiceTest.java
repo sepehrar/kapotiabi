@@ -11,6 +11,7 @@ import com.kapotiabi.dto.response.SavedShopResponse;
 import com.kapotiabi.entity.RepairShopEntity;
 import com.kapotiabi.entity.UserEntity;
 import com.kapotiabi.entity.UserSavedShopEntity;
+import com.kapotiabi.enums.RepairShopStatus;
 import com.kapotiabi.exception.NotFoundException;
 import com.kapotiabi.repository.RepairShopRepository;
 import com.kapotiabi.repository.UserRepository;
@@ -45,7 +46,7 @@ class UserSavedShopServiceTest {
         .city("Tallinn")
         .county("Harju")
         .phone("+372 555 1234")
-        .status("active")
+        .status(RepairShopStatus.ACTIVE)
         .build();
   }
 

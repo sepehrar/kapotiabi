@@ -15,6 +15,8 @@ import com.kapotiabi.entity.OfferSlotEntity;
 import com.kapotiabi.entity.RepairShopEntity;
 import com.kapotiabi.entity.ShopOfferEntity;
 import com.kapotiabi.entity.UserEntity;
+import com.kapotiabi.enums.JobRequestStatus;
+import com.kapotiabi.enums.ShopOfferStatus;
 import com.kapotiabi.exception.ForbiddenException;
 import com.kapotiabi.exception.NotFoundException;
 import com.kapotiabi.repository.JobRequestRepository;
@@ -65,7 +67,7 @@ class ShopOfferServiceTest {
         .jobRequest(JobRequestEntity.builder().id(10L).build())
         .shop(RepairShopEntity.builder().id(SHOP_ID).build())
         .priceEstimate(new BigDecimal("100.00"))
-        .status("pending")
+        .status(ShopOfferStatus.PENDING)
         .createdAt(LocalDateTime.now())
         .build();
   }
@@ -76,7 +78,7 @@ class ShopOfferServiceTest {
         .user(UserEntity.builder().id(CAR_OWNER_ID).build())
         .car(CarEntity.builder().id(3L).build())
         .description("Oil change")
-        .status("pending")
+        .status(JobRequestStatus.PENDING)
         .createdAt(LocalDateTime.now())
         .updatedAt(LocalDateTime.now())
         .build();
@@ -234,7 +236,7 @@ class ShopOfferServiceTest {
 
     ShopOfferResponse response = shopOfferService.reject(1L, CAR_OWNER_ID);
 
-    assertThat(response.status()).isEqualTo("rejected");
+    assertThat(response.status()).isEqualTo(ShopOfferStatus.REJECTED);
   }
 
   @Test

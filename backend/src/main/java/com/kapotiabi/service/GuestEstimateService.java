@@ -6,6 +6,7 @@ import com.kapotiabi.entity.GuestEstimateEntity;
 import com.kapotiabi.entity.GuestEstimateResultEntity;
 import com.kapotiabi.entity.RepairShopEntity;
 import com.kapotiabi.entity.ShopServiceCategoryEntity;
+import com.kapotiabi.enums.RepairShopStatus;
 import com.kapotiabi.exception.NotFoundException;
 import com.kapotiabi.repository.GuestEstimateRepository;
 import com.kapotiabi.repository.GuestEstimateResultRepository;
@@ -47,11 +48,11 @@ public class GuestEstimateService {
 
     List<RepairShopEntity> shops;
     if (req.city() != null) {
-      shops = repairShopRepository.findByStatusAndCity("active", req.city());
+      shops = repairShopRepository.findByStatusAndCity(RepairShopStatus.ACTIVE, req.city());
     } else if (req.county() != null) {
-      shops = repairShopRepository.findByStatusAndCounty("active", req.county());
+      shops = repairShopRepository.findByStatusAndCounty(RepairShopStatus.ACTIVE, req.county());
     } else {
-      shops = repairShopRepository.findByStatus("active");
+      shops = repairShopRepository.findByStatus(RepairShopStatus.ACTIVE);
     }
 
     BigDecimal overallMin = null;

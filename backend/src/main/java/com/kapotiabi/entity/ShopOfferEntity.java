@@ -1,5 +1,6 @@
 package com.kapotiabi.entity;
 
+import com.kapotiabi.enums.ShopOfferStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -55,7 +56,7 @@ public class ShopOfferEntity {
   @Column(name = "pdf_url")
   private String pdfUrl;
 
-  private String status;
+  private ShopOfferStatus status;
 
   @Column(name = "created_at", updatable = false)
   private LocalDateTime createdAt;

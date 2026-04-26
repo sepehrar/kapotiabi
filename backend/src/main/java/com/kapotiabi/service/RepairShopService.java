@@ -7,6 +7,7 @@ import com.kapotiabi.dto.response.ReviewResponse;
 import com.kapotiabi.dto.response.ShopServiceCategoryResponse;
 import com.kapotiabi.entity.RepairShopEntity;
 import com.kapotiabi.entity.ShopServiceCategoryEntity;
+import com.kapotiabi.enums.RepairShopStatus;
 import com.kapotiabi.exception.ForbiddenException;
 import com.kapotiabi.exception.NotFoundException;
 import com.kapotiabi.repository.RepairShopRepository;
@@ -34,31 +35,34 @@ public class RepairShopService {
   public Page<RepairShopResponse> getAll(String city, String county, Pageable pageable) {
     if (city != null) {
       return repairShopRepository
-          .findByStatusAndCity("active", city, pageable)
+          .findByStatusAndCity(RepairShopStatus.ACTIVE, city, pageable)
           .map(RepairShopResponse::from);
     } else if (county != null) {
       return repairShopRepository
-          .findByStatusAndCounty("active", county, pageable)
+          .findByStatusAndCounty(RepairShopStatus.ACTIVE, county, pageable)
           .map(RepairShopResponse::from);
     } else {
-      return repairShopRepository.findByStatus("active", pageable).map(RepairShopResponse::from);
+      return repairShopRepository
+          .findByStatus(RepairShopStatus.ACTIVE, pageable)
+          .map(RepairShopResponse::from);
     }
   }
 
   public List<RepairShopResponse> getAllForAdmin(String status) {
     List<RepairShopEntity> shops =
-        status != null ? repairShopRepository.findByStatus(status) : repairShopRepository.findAll();
+        status != null
+            ? repairShopRepository.findByStatus(RepairShopStatus.fromString(status))
+            : repairShopRepository.findAll();
     return shops.stream().map(RepairShopResponse::from).toList();
   }
 
   @Transactional
   public RepairShopResponse updateShopStatus(Long id, String action) {
     RepairShopEntity shop = findOrThrow(id);
-    if (!"draft".equals(shop.getStatus())) {
-      throw new IllegalStateException(
-          "Shop " + id + " is not in draft status (current: " + shop.getStatus() + ")");
-    }
-    shop.setStatus("approve".equals(action) ? "active" : "rejected");
+    RepairShopStatus next =
+        "approve".equals(action) ? RepairShopStatus.ACTIVE : RepairShopStatus.REJECTED;
+    shop.getStatus().assertCanTransitionTo(next);
+    shop.setStatus(next);
     return RepairShopResponse.from(repairShopRepository.save(shop));
   }
 
@@ -79,7 +83,7 @@ public class RepairShopService {
             .email(req.email())
             .website(req.website())
             .googleMapsUrl(req.googleMapsUrl())
-            .status(req.status())
+            .status(RepairShopStatus.DRAFT)
             .build();
     return RepairShopResponse.from(repairShopRepository.save(shop));
   }
@@ -97,7 +101,6 @@ public class RepairShopService {
     shop.setEmail(req.email());
     shop.setWebsite(req.website());
     shop.setGoogleMapsUrl(req.googleMapsUrl());
-    shop.setStatus(req.status());
     return RepairShopResponse.from(repairShopRepository.save(shop));
   }
 
