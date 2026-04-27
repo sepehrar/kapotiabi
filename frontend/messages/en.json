@@ -422,6 +422,7 @@
     "removeShop": "Remove {name} from compare",
     "clear": "Clear compare",
     "open": "Compare now",
+    "continueToAccount": "Open in account",
     "dialogTitle": "Compare selected repair shops",
     "dialogDescription": "A side-by-side view for {query}.",
     "dialogDescriptionFallback": "A side-by-side view of your shortlisted shops.",
@@ -459,6 +460,7 @@
     }
   },
   "accountProfile": {
+    "brand": "KapotiAbi",
     "title": "Profile",
     "description": "Manage your personal details and search preferences.",
     "sections": {
@@ -621,6 +623,11 @@
       "reschedule": "Reschedule",
       "cancel": "Cancel",
       "bookAgain": "Book again"
+    },
+    "empty": {
+      "title": "No bookings yet",
+      "description": "Choose a service from compare and confirm a time to see it here.",
+      "action": "Start a search"
     }
   },
 
@@ -694,6 +701,12 @@
       "new": "New",
       "viewed": "Viewed",
       "responded": "Responded"
+    },
+    "table": {
+      "request": "Request",
+      "status": "Status",
+      "budget": "Budget",
+      "received": "Received"
     },
     "openDetails": "Open details"
   },
@@ -801,7 +814,8 @@
     "title": "Book a time",
     "description": "Confirm your appointment with",
     "actions": {
-      "backToNotifications": "Back to notifications"
+      "backToNotifications": "Back to notifications",
+      "backToCompare": "Back to compare"
     },
     "sections": {
       "request": "Your request",
@@ -821,8 +835,13 @@
       "messagePlaceholder": "Any additional info about your car or request…",
       "selectDateAndTime": "Select a date and time to continue",
       "confirmBooking": "Confirm booking",
+      "reviewTitle": "Review booking details",
+      "reviewDescription": "Confirm the selected time before we send the booking request.",
+      "cancel": "Cancel",
+      "confirmFinal": "Confirm",
       "bookingConfirmed": "Booking confirmed!",
-      "redirecting": "Redirecting to notifications…"
+      "redirecting": "Redirecting to bookings…",
+      "bookingFailed": "We could not confirm this booking. Please try again."
     }
   },
   "businessLanding": {

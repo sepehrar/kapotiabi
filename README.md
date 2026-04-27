@@ -2,10 +2,42 @@
 
 Car repair marketplace for Estonia. Car owners describe their problem, get price estimates from repair shops, and book appointments.
 
+## Stack
+
+- **Frontend:** Next.js 16, React 19, Tailwind CSS, next-intl
+- **Backend:** Java 21, Spring Boot 4, Spring Security, Spring Data JPA, Flyway
+- **Database:** PostgreSQL for local/dev runtime, H2 for tests
+- **Auth:** JWT stored by the frontend demo client in `sessionStorage`
+
 ## Documentation
 
+- [Architecture overview](docs/architecture.md)
+- [Product flow diagram](docs/flow-diagram.md)
+- [Database diagram](docs/database-diagram.md)
+- [LLM usage](docs/llm-usage.md)
 - [Authentication (login, register, password reset)](docs/auth.md)
 - [Saved Shops (bookmarks)](docs/saved-shops.md)
+- [Authorization](docs/authorization.md)
+- [Offer slots](docs/offer-slots.md)
+- [User preferences](docs/user-preferences.md)
+- [Hybrid frontend demo flow](docs/frontend-demo-flow.md)
+
+## Team
+
+Kapotiabi is built as a full-stack student team project. The current focus is a working MVP demo: car owner search and booking flow, repair shop offer flow, protected account/business areas, and clear project documentation.
+
+## Demo Flow
+
+The current user-side demo flow is:
+
+1. User searches for a car problem in chat.
+2. Search returns matching repair shop cards.
+3. User selects 2-3 services for compare.
+4. User opens the compare list in `/account/compare`.
+5. User selects a service, picks a booking slot, and confirms in a modal.
+6. Booking appears in `/account/bookings`.
+
+For the demo, search-to-compare and mock bookings are stored in the browser session. If a compared service includes real `offerId` and `slotId` values, the booking confirmation calls the backend `POST /api/v1/offers/{id}/accept` endpoint instead.
 
 Auth endpoints:
 - `POST /api/v1/auth/register` — register a new user
@@ -21,13 +53,23 @@ Saved shops endpoints:
 ## Running Locally
 
 ```bash
-# Backend
+# Backend API
 cd backend
 SPRING_DATASOURCE_PASSWORD=kapotiabi ./mvnw spring-boot:run
 
-# Run tests
+# Frontend app
+cd frontend
+npm install
+npm run dev
+
+# Backend tests
 cd backend
 ./mvnw test
+
+# Frontend checks
+cd frontend
+npm run lint
+npm run build
 ```
 
 See [docs/auth.md](docs/auth.md) for full setup instructions and API reference.
