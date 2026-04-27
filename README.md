@@ -8,10 +8,10 @@ Car repair marketplace for Estonia. Car owners describe their problem, receive p
 
 | Layer | Technology |
 |---|---|
-| Backend | Spring Boot 3, Java 21, Spring Security, JPA/Hibernate |
+| Backend | Spring Boot 4.0.6, Java 21, Spring Security, JPA/Hibernate |
 | Frontend | Next.js 15, TypeScript, Tailwind CSS, next-intl |
-| Database | PostgreSQL 16, Flyway migrations |
-| Auth | JWT (stateless, RS256-compatible HS256) |
+| Database | PostgreSQL 17, Flyway migrations |
+| Auth | JWT (stateless, HMAC/shared secret, HS256-style) |
 | AI search | Groq API (server-side, Next.js API route) |
 | Infrastructure | Docker, Docker Compose |
 
@@ -86,7 +86,7 @@ npm run dev
 ```bash
 cd backend
 
-# Run all tests (131 tests)
+# Run all tests
 ./mvnw test
 
 # Check code formatting
