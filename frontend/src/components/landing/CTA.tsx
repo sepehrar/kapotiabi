@@ -40,7 +40,7 @@ export default function CTA() {
                           alt=""
                           width={288}
                           height={288}
-                          src="/img/cta/01.jpg"
+                          src="/img/cta/01.png"
                           className="size-64  object-cover md:size-72"
                         />
                       </div>
@@ -50,7 +50,7 @@ export default function CTA() {
                           alt=""
                           width={288}
                           height={288}
-                          src="/img/cta/02.jpg"
+                          src="/img/cta/02.png"
                           className="size-64  object-cover md:size-72"
                         />
                       </div>
@@ -62,7 +62,7 @@ export default function CTA() {
                           alt=""
                           width={288}
                           height={288}
-                          src="/img/cta/03.jpg"
+                          src="/img/cta/03.png"
                           className="size-64 object-cover md:size-72"
                         />
                       </div>
@@ -72,7 +72,7 @@ export default function CTA() {
                           alt=""
                           width={288}
                           height={288}
-                          src="/img/cta/04.jpg"
+                          src="/img/cta/04.png"
                           className="size-64  object-cover md:size-72"
                         />
                       </div>
