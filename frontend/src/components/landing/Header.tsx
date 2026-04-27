@@ -9,39 +9,13 @@ import LocaleSwitcher from "@/components/ui/LocaleSwitcher";
 import AuthMenu from "@/components/ui/AuthMenu";
 import Link from "next/link";
 import AccentButton from "@/components/ui/AccentButton";
-
-type UserRole = "CAR_OWNER" | "SHOP_OWNER";
-
-type AuthState = {
-  token: string | null;
-  role: UserRole | null;
-};
-
-function normalizeRole(role: string | null): UserRole | null {
-  if (role === "CAR_OWNER" || role === "car_owner") {
-    return "CAR_OWNER";
-  }
-
-  if (role === "SHOP_OWNER" || role === "shop_owner") {
-    return "SHOP_OWNER";
-  }
-
-  return null;
-}
-
-function readAuthState(): AuthState {
-  if (typeof window === "undefined") {
-    return {
-      token: null,
-      role: null,
-    };
-  }
-
-  return {
-    token: sessionStorage.getItem("authToken"),
-    role: normalizeRole(sessionStorage.getItem("authRole")),
-  };
-}
+import {
+  AUTH_CHANGED_EVENT,
+  clearAuthState,
+  getLocaleFromPath,
+  readAuthState,
+  type AuthState,
+} from "@/lib/authSession";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -50,9 +24,7 @@ export default function Header() {
   const t = useTranslations("header");
   const router = useRouter();
   const pathname = usePathname();
-
-  const localeFromPath = pathname.split("/")[1];
-  const currentLocale = localeFromPath === "et" ? "et" : "en";
+  const currentLocale = getLocaleFromPath(pathname);
 
   useEffect(() => {
     const syncAuthState = () => {
@@ -61,11 +33,11 @@ export default function Header() {
 
     syncAuthState();
 
-    window.addEventListener("auth-changed", syncAuthState);
+    window.addEventListener(AUTH_CHANGED_EVENT, syncAuthState);
     window.addEventListener("storage", syncAuthState);
 
     return () => {
-      window.removeEventListener("auth-changed", syncAuthState);
+      window.removeEventListener(AUTH_CHANGED_EVENT, syncAuthState);
       window.removeEventListener("storage", syncAuthState);
     };
   }, [pathname]);
@@ -75,9 +47,7 @@ export default function Header() {
   const isAuthenticated = Boolean(authToken && authRole);
 
   const handleLogout = () => {
-    sessionStorage.removeItem("authToken");
-    sessionStorage.removeItem("authRole");
-    window.dispatchEvent(new Event("auth-changed"));
+    clearAuthState();
     setMobileMenuOpen(false);
     router.push(`/${currentLocale}`);
   };

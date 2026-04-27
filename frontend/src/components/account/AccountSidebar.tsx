@@ -23,6 +23,7 @@ import {
   ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import LocaleSwitcher from "@/components/ui/LocaleSwitcher";
+import { clearAuthState, getLocaleFromPath } from "@/lib/authSession";
 
 const navigation = [
   { key: "dashboard", href: "/account", icon: HomeIcon },
@@ -166,13 +167,10 @@ export default function AccountSidebar() {
   const t = useTranslations("accountSidebar");
   const logoutT = useTranslations("authMenu");
 
-  const localeFromPath = pathname.split("/")[1];
-  const currentLocale: "en" | "et" = localeFromPath === "et" ? "et" : "en";
+  const currentLocale = getLocaleFromPath(pathname);
 
   const handleLogout = () => {
-    sessionStorage.removeItem("authToken");
-    sessionStorage.removeItem("authRole");
-    window.dispatchEvent(new Event("auth-changed"));
+    clearAuthState();
     setSidebarOpen(false);
     router.push(`/${currentLocale}`);
   };

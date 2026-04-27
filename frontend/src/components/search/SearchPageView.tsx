@@ -22,157 +22,25 @@ import {
   type ChatMessage,
   type ChatResponseBody,
   type ChatStatus,
-  type PartsQuality,
   type SearchFilters,
 } from "@/lib/search-chat";
 import type { Locale } from "@/lib/locale";
 import { buildDemoService, saveCompareDraft } from "@/lib/demoFlowSession";
+import {
+  findMatchingSearchResultSeeds,
+  normalizeSearchText,
+  type SearchResultSeed,
+} from "@/lib/search-results";
 import type { SortOption } from "./SearchResultsToolbar";
 import type { SearchResult } from "./SearchResultCard";
 
 type SearchPhase = "collecting" | "searching" | "results" | "locked";
-
-type SearchResultSeed = {
-  id: number;
-  name: string;
-  price: string;
-  distance: string;
-  rating: string;
-  reviews: number;
-  updatedAt: string;
-  city: string;
-  priceValue: number;
-  distanceValue: number;
-  ratingValue: number;
-  serviceKeywords: string[];
-  makeKeywords: string[];
-  modelKeywords: string[];
-  areaKeywords: string[];
-  partsQualities: PartsQuality[];
-};
 
 const SEARCH_DELAY_MS = 900;
 const STATUS_PATTERNS = {
   en: /\b(did you find anything|what did you find|show me the results|any results)\b/i,
   et: /\b(kas sa leidsid midagi|mida sa leidsid|näita tulemusi|kas tulemusi on)\b/i,
 };
-
-const SEARCH_RESULT_CATALOG: SearchResultSeed[] = [
-  {
-    id: 1,
-    name: "AutoExpert Tallinn",
-    price: "€95",
-    distance: "3.2 km",
-    rating: "4.7",
-    reviews: 214,
-    updatedAt: "Updated 2 days ago",
-    city: "Tallinn",
-    priceValue: 95,
-    distanceValue: 3.2,
-    ratingValue: 4.7,
-    serviceKeywords: ["oil change", "maintenance", "inspection", "service"],
-    makeKeywords: ["bmw", "audi", "volkswagen"],
-    modelKeywords: ["3 series", "f30", "f31", "320d"],
-    areaKeywords: ["kristiine", "kristiine keskus", "lillekula", "mustamae"],
-    partsQualities: ["budget", "oem_equivalent", "oem"],
-  },
-  {
-    id: 2,
-    name: "Nord Service",
-    price: "From €80",
-    distance: "5.6 km",
-    rating: "4.5",
-    reviews: 98,
-    updatedAt: "Updated today",
-    city: "Tallinn",
-    priceValue: 80,
-    distanceValue: 5.6,
-    ratingValue: 4.5,
-    serviceKeywords: ["oil change", "maintenance", "diagnostics", "service"],
-    makeKeywords: ["bmw", "toyota", "volvo", "skoda"],
-    modelKeywords: ["3 series", "f30", "corolla", "xc60"],
-    areaKeywords: ["mustamae", "kristiine", "haabersti"],
-    partsQualities: ["budget", "oem_equivalent"],
-  },
-  {
-    id: 3,
-    name: "FixCar Center",
-    price: "€110",
-    distance: "6.8 km",
-    rating: "4.8",
-    reviews: 156,
-    updatedAt: "Updated 5 days ago",
-    city: "Tallinn",
-    priceValue: 110,
-    distanceValue: 6.8,
-    ratingValue: 4.8,
-    serviceKeywords: ["oil change", "brake repair", "a/c service", "maintenance"],
-    makeKeywords: ["bmw", "mercedes", "audi"],
-    modelKeywords: ["3 series", "f31", "c-class"],
-    areaKeywords: ["kesklinn", "stockmann", "lillekula"],
-    partsQualities: ["oem_equivalent", "oem"],
-  },
-  {
-    id: 4,
-    name: "Kristiine Auto Hub",
-    price: "€105",
-    distance: "2.1 km",
-    rating: "4.6",
-    reviews: 121,
-    updatedAt: "Updated yesterday",
-    city: "Tallinn",
-    priceValue: 105,
-    distanceValue: 2.1,
-    ratingValue: 4.6,
-    serviceKeywords: ["oil change", "maintenance", "engine service"],
-    makeKeywords: ["bmw", "audi", "mercedes"],
-    modelKeywords: ["3 series", "f30", "a4"],
-    areaKeywords: ["kristiine", "kristiine keskus", "tihase"],
-    partsQualities: ["oem_equivalent", "oem"],
-  },
-  {
-    id: 5,
-    name: "Tartu Garage",
-    price: "€85",
-    distance: "4.4 km",
-    rating: "4.4",
-    reviews: 77,
-    updatedAt: "Updated today",
-    city: "Tartu",
-    priceValue: 85,
-    distanceValue: 4.4,
-    ratingValue: 4.4,
-    serviceKeywords: ["oil change", "maintenance", "service"],
-    makeKeywords: ["bmw", "toyota", "ford"],
-    modelKeywords: ["3 series", "focus"],
-    areaKeywords: ["kesklinn", "raudteejaam"],
-    partsQualities: ["budget", "oem_equivalent"],
-  },
-];
-
-function normalizeValue(value: string | null | undefined) {
-  return value?.trim().toLowerCase() ?? "";
-}
-
-function tokenizeServiceQuery(serviceQuery: string | null) {
-  return normalizeValue(serviceQuery)
-    .split(/[\s,/.-]+/)
-    .filter(Boolean);
-}
-
-function countKeywordMatches(tokens: string[], keywords: string[]) {
-  return tokens.reduce((count, token) => {
-    const matched = keywords.some((keyword) => {
-      const normalizedKeyword = normalizeValue(keyword);
-
-      return (
-        normalizedKeyword.includes(token) || token.includes(normalizedKeyword)
-      );
-    });
-
-    return count + (matched ? 1 : 0);
-  }, 0);
-}
 
 function extractLocationHint(text: string, locale: Locale): string | null {
   const normalizedText = text.trim();
@@ -296,11 +164,11 @@ function buildResultCardData(
     .join(" ");
   const serviceLabel =
     filters.serviceQuery ?? cardT("serviceFitFallbackService");
-  const normalizedLocationHint = normalizeValue(locationHint);
+  const normalizedLocationHint = normalizeSearchText(locationHint);
   const areaMatch = normalizedLocationHint
     ? locationHint &&
       result.areaKeywords.some((keyword) => {
-        const normalizedKeyword = normalizeValue(keyword);
+        const normalizedKeyword = normalizeSearchText(keyword);
 
         return (
           normalizedLocationHint.includes(normalizedKeyword) ||
@@ -430,83 +298,12 @@ function deriveVisibleResults(
   cardT: ReturnType<typeof useTranslations>,
   chatT: ReturnType<typeof useTranslations>,
 ) {
-  const city = normalizeValue(filters.city);
-  const make = normalizeValue(filters.vehicleMake);
-  const model = normalizeValue(filters.vehicleModel);
-  const serviceTokens = tokenizeServiceQuery(filters.serviceQuery);
-  const normalizedLocationHint = normalizeValue(locationHint);
-
-  const matchedResults = SEARCH_RESULT_CATALOG.map((result) => {
-    let score = 0;
-
-    if (city && normalizeValue(result.city) === city) {
-      score += 5;
-    }
-
-    const serviceMatches = countKeywordMatches(
-      serviceTokens,
-      result.serviceKeywords,
-    );
-    score += serviceMatches * 2;
-
-    if (serviceTokens.length && serviceMatches === 0) {
-      score -= 4;
-    }
-
-    if (
-      make &&
-      result.makeKeywords.some((keyword) => normalizeValue(keyword) === make)
-    ) {
-      score += 2;
-    }
-
-    if (
-      model &&
-      result.modelKeywords.some((keyword) => {
-        const normalizedKeyword = normalizeValue(keyword);
-
-        return (
-          normalizeValue(model).includes(normalizedKeyword) ||
-          normalizedKeyword.includes(model)
-        );
-      })
-    ) {
-      score += 2;
-    }
-
-    if (
-      normalizedLocationHint &&
-      result.areaKeywords.some((keyword) => {
-        const normalizedKeyword = normalizeValue(keyword);
-
-        return (
-          normalizedLocationHint.includes(normalizedKeyword) ||
-          normalizedKeyword.includes(normalizedLocationHint)
-        );
-      })
-    ) {
-      score += 3;
-    }
-
-    if (
-      filters.partsQuality &&
-      result.partsQualities.includes(filters.partsQuality)
-    ) {
-      score += 1;
-    }
-
-    return { result, score };
-  })
-    .filter(({ score, result }) => {
-      if (city && normalizeValue(result.city) !== city) {
-        return false;
-      }
-
-      return score >= 5;
-    })
-    .map(({ result }) =>
-      buildResultCardData(result, filters, locationHint, locale, cardT, chatT),
-    );
+  const matchedResults = findMatchingSearchResultSeeds(
+    filters,
+    locationHint,
+  ).map((result) =>
+    buildResultCardData(result, filters, locationHint, locale, cardT, chatT),
+  );
 
   return sortResults(matchedResults, sortBy).slice(0, 3);
 }

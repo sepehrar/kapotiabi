@@ -1,35 +1,20 @@
 "use client";
 
-import { type ReactNode, useEffect } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-
-type UserRole = "CAR_OWNER" | "SHOP_OWNER";
+import {
+  AUTH_CHANGED_EVENT,
+  getLocaleFromPath,
+  getRoleHome,
+  readAuthState,
+  type AuthState,
+  type UserRole,
+} from "@/lib/authSession";
 
 type AuthRouteGuardProps = {
   children: ReactNode;
   requiredRole: UserRole;
 };
-
-function normalizeRole(role: string | null): UserRole | null {
-  if (role === "CAR_OWNER" || role === "car_owner") {
-    return "CAR_OWNER";
-  }
-
-  if (role === "SHOP_OWNER" || role === "shop_owner") {
-    return "SHOP_OWNER";
-  }
-
-  return null;
-}
-
-function getLocaleFromPath(pathname: string) {
-  const locale = pathname.split("/")[1];
-  return locale === "et" ? "et" : "en";
-}
-
-function getRoleHome(locale: string, role: UserRole) {
-  return role === "CAR_OWNER" ? `/${locale}/account` : `/${locale}/business`;
-}
 
 export default function AuthRouteGuard({
   children,
@@ -38,25 +23,50 @@ export default function AuthRouteGuard({
   const pathname = usePathname();
   const router = useRouter();
   const locale = getLocaleFromPath(pathname);
-  const token =
-    typeof window === "undefined" ? null : sessionStorage.getItem("authToken");
-  const role =
-    typeof window === "undefined"
-      ? null
-      : normalizeRole(sessionStorage.getItem("authRole"));
+  const [authState, setAuthState] = useState<AuthState>({
+    token: null,
+    role: null,
+  });
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    if (!token || !role) {
+    const syncAuthState = () => {
+      setAuthState(readAuthState());
+      setIsHydrated(true);
+    };
+
+    syncAuthState();
+
+    window.addEventListener(AUTH_CHANGED_EVENT, syncAuthState);
+    window.addEventListener("storage", syncAuthState);
+
+    return () => {
+      window.removeEventListener(AUTH_CHANGED_EVENT, syncAuthState);
+      window.removeEventListener("storage", syncAuthState);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isHydrated) {
+      return;
+    }
+
+    if (!authState.token || !authState.role) {
       router.replace(`/${locale}/login`);
       return;
     }
 
-    if (role !== requiredRole) {
-      router.replace(getRoleHome(locale, role));
+    if (authState.role !== requiredRole) {
+      router.replace(getRoleHome(locale, authState.role));
     }
-  }, [locale, requiredRole, role, router, token]);
+  }, [authState, isHydrated, locale, requiredRole, router]);
 
-  if (!token || !role || role !== requiredRole) {
+  if (
+    !isHydrated ||
+    !authState.token ||
+    !authState.role ||
+    authState.role !== requiredRole
+  ) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-black text-sm text-white/50">
         Loading...
