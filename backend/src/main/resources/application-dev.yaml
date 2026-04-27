@@ -3,4 +3,5 @@ jwt:
 
 app:
   admin:
+    seed-enabled: true
     password: Admin1234

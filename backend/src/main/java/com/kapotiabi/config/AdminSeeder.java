@@ -7,10 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConditionalOnProperty(name = "app.admin.seed-enabled", havingValue = "true")
 @RequiredArgsConstructor
 public class AdminSeeder implements ApplicationRunner {
 
@@ -25,6 +27,11 @@ public class AdminSeeder implements ApplicationRunner {
 
   @Override
   public void run(ApplicationArguments args) {
+    if (adminPassword == null || adminPassword.isBlank()) {
+      throw new IllegalStateException(
+          "app.admin.seed-enabled is true but app.admin.password is blank. "
+              + "Set ADMIN_DEFAULT_PASSWORD to a non-empty value.");
+    }
     if (userRepository.existsByEmail(adminEmail)) {
       return;
     }
