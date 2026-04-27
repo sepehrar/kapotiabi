@@ -12,8 +12,8 @@ Kapotiabi is a three-tier web application: a Next.js frontend, a Spring Boot RES
 graph TD
     Browser["Browser\n(Next.js client)"]
     Frontend["Frontend\nNext.js 15 — :3000"]
-    Backend["Backend\nSpring Boot 3 — :8080"]
-    DB["Database\nPostgreSQL 16 — :5432"]
+    Backend["Backend\nSpring Boot 4.0.6 — :8080"]
+    DB["Database\nPostgreSQL 17 — :5432"]
     Groq["Groq API\n(external LLM)"]
 
     Browser -->|"HTTP/JSON"| Frontend
@@ -29,8 +29,9 @@ graph TD
 1. **Browser** sends a request to Next.js (port 3000).
 2. For page renders, Next.js serves HTML/JS. For API calls, the browser calls the Spring Boot backend directly on port 8080.
 3. **Spring Security** intercepts every request:
-   - Paths under `/api/v1/auth/**` and `/api/v1/guest-estimates/**` are public.
-   - All other paths require a valid JWT in the `Authorization: Bearer` header.
+   - Paths under `/api/v1/auth/**` are public.
+   - Swagger/OpenAPI documentation endpoints are also public.
+   - All other application paths, including `/api/v1/guest-estimates/**`, require a valid JWT in the `Authorization: Bearer` header.
    - `/api/v1/admin/**` additionally requires `ROLE_ADMIN`.
 4. `JwtAuthenticationFilter` validates the token, extracts the user ID and role, and sets the `SecurityContext`.
 5. **Controllers** delegate to **Services** which enforce ownership rules using `SecurityUtils.getAuthUserId()`.

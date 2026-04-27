@@ -1,6 +1,6 @@
 # Database
 
-PostgreSQL 16. Schema managed by Flyway — migrations live in `backend/src/main/resources/db/migration/`.
+PostgreSQL 17. Schema managed by Flyway — migrations live in `backend/src/main/resources/db/migration/`.
 
 ---
 
