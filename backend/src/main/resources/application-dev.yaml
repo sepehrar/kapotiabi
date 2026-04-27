@@ -1,2 +1,6 @@
 jwt:
   secret: dev-secret-key-min-256-bits-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+app:
+  admin:
+    password: Admin1234

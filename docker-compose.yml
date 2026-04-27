@@ -18,6 +18,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/kapotiabi
       SPRING_DATASOURCE_USERNAME: kapotiabi
       SPRING_DATASOURCE_PASSWORD:
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_DEFAULT_PASSWORD: ${ADMIN_DEFAULT_PASSWORD}
       APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-http://localhost:3000}
     depends_on:
       - db

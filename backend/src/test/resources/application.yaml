@@ -19,3 +19,6 @@ app:
   upload-dir: uploads
   cors:
     allowed-origins: http://localhost:3000
+  admin:
+    email: admin@kapotiabi.ee
+    password: Admin1234
