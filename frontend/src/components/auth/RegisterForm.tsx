@@ -7,6 +7,13 @@ import { FormEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import SectionTitle from "../ui/SectionTitle";
+import {
+  getLocaleFromPath,
+  getRoleHome,
+  normalizeRole,
+  type UserRole,
+  writeAuthState,
+} from "@/lib/authSession";
 import { getPublicApiBaseUrl } from "@/lib/publicApiBaseUrl";
 import {
   validateRegisterForm,
@@ -22,28 +29,12 @@ type RegisterApiResponse = {
   shopStatus: string | null;
 };
 
-type UserRole = "CAR_OWNER" | "SHOP_OWNER";
-
-function normalizeRole(role: string | null): UserRole | null {
-  if (role === "CAR_OWNER" || role === "car_owner") {
-    return "CAR_OWNER";
-  }
-
-  if (role === "SHOP_OWNER" || role === "shop_owner") {
-    return "SHOP_OWNER";
-  }
-
-  return null;
-}
-
 export default function RegisterForm() {
   const t = useTranslations("register");
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-
-  const localeFromPath = pathname.split("/")[1];
-  const currentLocale = localeFromPath === "et" ? "et" : "en";
+  const currentLocale = getLocaleFromPath(pathname);
 
   const roleFromUrl = normalizeRole(searchParams.get("role"));
 
@@ -128,17 +119,10 @@ export default function RegisterForm() {
       if (data && "token" in data && data.token) {
         const normalizedRole = normalizeRole(data.role);
 
-        sessionStorage.setItem("authToken", data.token);
-        sessionStorage.setItem("authRole", data.role);
-        window.dispatchEvent(new Event("auth-changed"));
+        writeAuthState(data.token, data.role);
 
-        if (normalizedRole === "CAR_OWNER") {
-          router.push(`/${currentLocale}/account`);
-          return;
-        }
-
-        if (normalizedRole === "SHOP_OWNER") {
-          router.push(`/${currentLocale}/business`);
+        if (normalizedRole) {
+          router.replace(getRoleHome(currentLocale, normalizedRole));
           return;
         }
       }
@@ -156,7 +140,7 @@ export default function RegisterForm() {
       setShowPassword(false);
       setShowConfirmPassword(false);
 
-      router.push(`/${currentLocale}`);
+      router.replace(`/${currentLocale}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : t("errors.generic"));
     } finally {

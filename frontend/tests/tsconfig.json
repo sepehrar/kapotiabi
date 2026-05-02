@@ -10,5 +10,11 @@
     "target": "ES2022",
     "types": ["node"]
   },
-  "include": ["./*.test.ts", "../src/lib/demoFlowSession.ts"]
+  "include": [
+    "./*.test.ts",
+    "../src/lib/demoFlowSession.ts",
+    "../src/lib/authSession.ts",
+    "../src/lib/search-chat.ts",
+    "../src/lib/search-results.ts"
+  ]
 }
