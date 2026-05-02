@@ -40,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     new SimpleGrantedAuthority(
                         SecurityConstants.ROLE_AUTHORITY_PREFIX + role.toUpperCase())));
         SecurityContextHolder.getContext().setAuthentication(auth);
-      } catch (JwtException ex) {
+      } catch (JwtException | IllegalArgumentException ex) {
         log.warn(
             "Ignoring invalid JWT for {} {}: {}",
             request.getMethod(),

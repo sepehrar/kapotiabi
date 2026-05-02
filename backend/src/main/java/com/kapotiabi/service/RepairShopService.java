@@ -111,8 +111,11 @@ public class RepairShopService {
   }
 
   @Transactional
-  public ShopServiceCategoryResponse addCategory(Long shopId, ShopServiceCategoryRequest req) {
+  public ShopServiceCategoryResponse addCategory(
+      Long shopId, ShopServiceCategoryRequest req, Long authUserId) {
     RepairShopEntity shop = findOrThrow(shopId);
+    if (!authUserId.equals(shop.getOwner().getId()))
+      throw new ForbiddenException("You don't have access to this shop");
     ShopServiceCategoryEntity category =
         ShopServiceCategoryEntity.builder()
             .shop(shop)
@@ -127,8 +130,10 @@ public class RepairShopService {
 
   @Transactional
   public ShopServiceCategoryResponse updateCategory(
-      Long shopId, Long categoryId, ShopServiceCategoryRequest req) {
-    findOrThrow(shopId);
+      Long shopId, Long categoryId, ShopServiceCategoryRequest req, Long authUserId) {
+    RepairShopEntity shop = findOrThrow(shopId);
+    if (!authUserId.equals(shop.getOwner().getId()))
+      throw new ForbiddenException("You don't have access to this shop");
     ShopServiceCategoryEntity category =
         categoryRepository
             .findById(categoryId)
@@ -145,8 +150,10 @@ public class RepairShopService {
   }
 
   @Transactional
-  public void deleteCategory(Long shopId, Long categoryId) {
-    findOrThrow(shopId);
+  public void deleteCategory(Long shopId, Long categoryId, Long authUserId) {
+    RepairShopEntity shop = findOrThrow(shopId);
+    if (!authUserId.equals(shop.getOwner().getId()))
+      throw new ForbiddenException("You don't have access to this shop");
     ShopServiceCategoryEntity category =
         categoryRepository
             .findById(categoryId)

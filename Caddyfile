@@ -1,0 +1,30 @@
+www.kapotiabi.ee {
+	encode gzip
+
+	header {
+		Strict-Transport-Security "max-age=15552000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Robots-Tag "noindex, nofollow"
+	}
+
+	@swagger path /swagger-ui* /swagger-ui.html /v3/api-docs*
+	handle @swagger {
+		basicauth {
+			admin {env.SWAGGER_BASIC_HASH}
+		}
+		reverse_proxy backend:8080
+	}
+
+	handle /api/* {
+		reverse_proxy backend:8080
+	}
+
+	handle {
+		reverse_proxy frontend:3000
+	}
+}
+
+kapotiabi.ee {
+	redir https://www.kapotiabi.ee{uri} permanent
+}

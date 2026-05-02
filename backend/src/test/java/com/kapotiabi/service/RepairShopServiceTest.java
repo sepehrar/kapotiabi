@@ -179,10 +179,22 @@ class RepairShopServiceTest {
     var req =
         new ShopServiceCategoryRequest(
             "oil_change", new BigDecimal("30.00"), new BigDecimal("60.00"), "OEM");
-    var response = repairShopService.addCategory(1L, req);
+    var response = repairShopService.addCategory(1L, req, 5L);
 
     assertThat(response.category()).isEqualTo("oil_change");
     assertThat(response.shopId()).isEqualTo(1L);
+  }
+
+  @Test
+  void addCategory_wrongOwner_throwsForbidden() {
+    when(repairShopRepository.findById(1L)).thenReturn(Optional.of(buildShop()));
+
+    var req =
+        new ShopServiceCategoryRequest(
+            "oil_change", new BigDecimal("30.00"), new BigDecimal("60.00"), "OEM");
+
+    assertThatThrownBy(() -> repairShopService.addCategory(1L, req, 999L))
+        .isInstanceOf(ForbiddenException.class);
   }
 
   @Test
@@ -196,9 +208,21 @@ class RepairShopServiceTest {
     var req =
         new ShopServiceCategoryRequest(
             "tire_change", new BigDecimal("50.00"), new BigDecimal("100.00"), "OEM");
-    ShopServiceCategoryResponse response = repairShopService.updateCategory(1L, 10L, req);
+    ShopServiceCategoryResponse response = repairShopService.updateCategory(1L, 10L, req, 5L);
 
     assertThat(response.category()).isEqualTo("tire_change");
+  }
+
+  @Test
+  void updateCategory_wrongOwner_throwsForbidden() {
+    when(repairShopRepository.findById(1L)).thenReturn(Optional.of(buildShop()));
+
+    var req =
+        new ShopServiceCategoryRequest(
+            "tire_change", new BigDecimal("50.00"), new BigDecimal("100.00"), "OEM");
+
+    assertThatThrownBy(() -> repairShopService.updateCategory(1L, 10L, req, 999L))
+        .isInstanceOf(ForbiddenException.class);
   }
 
   @Test
@@ -206,8 +230,16 @@ class RepairShopServiceTest {
     when(repairShopRepository.findById(1L)).thenReturn(Optional.of(buildShop()));
     when(categoryRepository.findById(10L)).thenReturn(Optional.of(buildCategory()));
 
-    repairShopService.deleteCategory(1L, 10L);
+    repairShopService.deleteCategory(1L, 10L, 5L);
 
     verify(categoryRepository).deleteById(10L);
+  }
+
+  @Test
+  void deleteCategory_wrongOwner_throwsForbidden() {
+    when(repairShopRepository.findById(1L)).thenReturn(Optional.of(buildShop()));
+
+    assertThatThrownBy(() -> repairShopService.deleteCategory(1L, 10L, 999L))
+        .isInstanceOf(ForbiddenException.class);
   }
 }

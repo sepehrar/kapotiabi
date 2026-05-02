@@ -86,7 +86,8 @@ public class RepairShopController {
   @Operation(summary = "Add a service category to a shop")
   public ResponseEntity<ShopServiceCategoryResponse> addCategory(
       @PathVariable Long id, @Valid @RequestBody ShopServiceCategoryRequest req) {
-    ShopServiceCategoryResponse created = repairShopService.addCategory(id, req);
+    ShopServiceCategoryResponse created =
+        repairShopService.addCategory(id, req, SecurityUtils.getAuthUserId());
     URI location =
         ServletUriComponentsBuilder.fromCurrentRequest()
             .path("/{catId}")
@@ -101,13 +102,14 @@ public class RepairShopController {
       @PathVariable Long id,
       @PathVariable Long catId,
       @Valid @RequestBody ShopServiceCategoryRequest req) {
-    return ResponseEntity.ok(repairShopService.updateCategory(id, catId, req));
+    return ResponseEntity.ok(
+        repairShopService.updateCategory(id, catId, req, SecurityUtils.getAuthUserId()));
   }
 
   @DeleteMapping("/{id}/categories/{catId}")
   @Operation(summary = "Delete a service category")
   public ResponseEntity<Void> deleteCategory(@PathVariable Long id, @PathVariable Long catId) {
-    repairShopService.deleteCategory(id, catId);
+    repairShopService.deleteCategory(id, catId, SecurityUtils.getAuthUserId());
     return ResponseEntity.noContent().build();
   }
 

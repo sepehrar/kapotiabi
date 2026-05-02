@@ -154,7 +154,7 @@ class RepairShopControllerTest {
 
   @Test
   void addCategory_returns201() throws Exception {
-    when(repairShopService.addCategory(eq(1L), any(ShopServiceCategoryRequest.class)))
+    when(repairShopService.addCategory(eq(1L), any(ShopServiceCategoryRequest.class), eq(5L)))
         .thenReturn(buildCategory());
 
     mockMvc
@@ -168,12 +168,38 @@ class RepairShopControllerTest {
   }
 
   @Test
+  void addCategory_nonOwner_returns403() throws Exception {
+    when(repairShopService.addCategory(eq(1L), any(ShopServiceCategoryRequest.class), eq(5L)))
+        .thenThrow(new ForbiddenException("Not your shop"));
+
+    mockMvc
+        .perform(
+            post("/api/v1/shops/1/categories")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"category\":\"Brakes\",\"priceFrom\":50.00,\"priceTo\":200.00}"))
+        .andExpect(status().isForbidden())
+        .andExpect(jsonPath("$.message").value("Not your shop"));
+  }
+
+  @Test
   void deleteCategory_returns204() throws Exception {
-    doNothing().when(repairShopService).deleteCategory(1L, 30L);
+    doNothing().when(repairShopService).deleteCategory(1L, 30L, 5L);
 
     mockMvc.perform(delete("/api/v1/shops/1/categories/30")).andExpect(status().isNoContent());
 
-    verify(repairShopService).deleteCategory(1L, 30L);
+    verify(repairShopService).deleteCategory(1L, 30L, 5L);
+  }
+
+  @Test
+  void deleteCategory_nonOwner_returns403() throws Exception {
+    doThrow(new ForbiddenException("Not your shop"))
+        .when(repairShopService)
+        .deleteCategory(1L, 30L, 5L);
+
+    mockMvc
+        .perform(delete("/api/v1/shops/1/categories/30"))
+        .andExpect(status().isForbidden())
+        .andExpect(jsonPath("$.message").value("Not your shop"));
   }
 
   @Test
