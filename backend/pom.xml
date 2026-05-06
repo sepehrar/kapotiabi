@@ -263,7 +263,8 @@
 				<configuration>
 					<excludes>
 						<exclude>com/kapotiabi/KapotiabiApplication.class</exclude>
-						<exclude>com/kapotiabi/config/**</exclude>
+						<exclude>com/kapotiabi/config/JwtConfig.class</exclude>
+						<exclude>com/kapotiabi/config/OpenApiConfig.class</exclude>
 						<exclude>com/kapotiabi/dto/**</exclude>
 						<exclude>com/kapotiabi/entity/**</exclude>
 					</excludes>
